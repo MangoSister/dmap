@@ -38,9 +38,8 @@ namespace ks
 DECLARE_TASK(small_pt);
 DECLARE_TASK(convert_hdri_to_equal_area);
 DECLARE_TASK(tonemap);
-// DECLARE_TASK(parallel_kd_tree_test);
 } // namespace ks
-// DECLARE_TASK(test_weighted_area_sampling);
+DECLARE_TASK(test_weighted_area_sampling);
 
 int main(int argc, char *argv[])
 {
@@ -72,22 +71,22 @@ int main(int argc, char *argv[])
     // nthreads = 1;
     init_parallel(nthreads);
 
-//     std::array<const char *, 1> shader_search_paths = {SHADER_DIR};
-//     int vk_device = args["device"].as<int>();
-//     bool vk_validation = (args["validation"].as<int>() != 0);
-//     bool vk_swapchain = (args["window"].as<int>() != 0); // TODO
+    //     std::array<const char *, 1> shader_search_paths = {SHADER_DIR};
+    //     int vk_device = args["device"].as<int>();
+    //     bool vk_validation = (args["validation"].as<int>() != 0);
+    //     bool vk_swapchain = (args["window"].as<int>() != 0); // TODO
 
-//     vk::ContextArgs vkctx_args = get_default_context_args(vk_validation, vk_swapchain);
-// #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
-//     vkctx_args.device_extensions.push_back(VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME);
-//     vkctx_args.device_extensions.push_back(VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME);
-// #elif defined(__linux__)
-//     vkctx_args.device_extensions.push_back(VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME);
-//     vkctx_args.device_extensions.push_back(VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME);
-// #endif
+    //     vk::ContextArgs vkctx_args = get_default_context_args(vk_validation, vk_swapchain);
+    // #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
+    //     vkctx_args.device_extensions.push_back(VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME);
+    //     vkctx_args.device_extensions.push_back(VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME);
+    // #elif defined(__linux__)
+    //     vkctx_args.device_extensions.push_back(VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME);
+    //     vkctx_args.device_extensions.push_back(VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME);
+    // #endif
 
-//     const char *slang_profile = "spirv_1_6 + spvGroupNonUniformBallot + spvGroupNonUniformArithmetic";
-//     init_gpu(shader_search_paths, slang_profile, vk_device, vkctx_args);
+    //     const char *slang_profile = "spirv_1_6 + spvGroupNonUniformBallot + spvGroupNonUniformArithmetic";
+    //     init_gpu(shader_search_paths, slang_profile, vk_device, vkctx_args);
 
     // init_cuda();
 
@@ -114,7 +113,7 @@ int main(int argc, char *argv[])
     cfg.register_task("convert_hdri_to_equal_area", convert_hdri_to_equal_area);
     cfg.register_task("tonemap", tonemap);
     //
-    // cfg.register_task("test_weighted_area_sampling", test_weighted_area_sampling);
+    cfg.register_task("test_weighted_area_sampling", test_weighted_area_sampling);
     cfg.run_all_tasks();
 
     return 0;

@@ -182,6 +182,7 @@ set(IMGUI_SRC
 
 set(DMAP_SRC
   src/main.cpp  
+  src/test_weighted_area_sampling.cpp
 )
 
 #-----------------------------------------------------------------------------
