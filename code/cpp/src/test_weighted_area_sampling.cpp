@@ -6,6 +6,6 @@ using namespace ks;
 
 void test_weighted_area_sampling(const ConfigArgs &args, const fs::path &task_dir, int task_id)
 {
-    //
+    get_default_logger().info("Weighted Area Sampling Test");
     return;
 }

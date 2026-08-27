@@ -43,15 +43,14 @@ DECLARE_TASK(test_weighted_area_sampling);
 
 int main(int argc, char *argv[])
 {
-    cxxopts::Options options("gsr", "Gaussian Scene Representation");
+    cxxopts::Options options("dmap", "Tessellation-free Displacement Maps Fun");
     // clang-format off
     options.add_options()
         ("n,nthreads", "number of cpu threads", cxxopts::value<int>()->default_value("0"))
         ("d,device", "gpu device index", cxxopts::value<int>()->default_value("0"))
         ("v,validation", "vulkan validation", cxxopts::value<int>()->default_value("1"))
         ("w,window", "require window/swapchain", cxxopts::value<int>()->default_value("1"))
-         ("c,config", "config file", cxxopts::value<std::string>()->default_value("config.toml"))
-        // ("c,config", "config file", cxxopts::value<std::string>()->default_value(std::string(DATA_DIR) + "....toml"))
+         ("c,config", "config file", cxxopts::value<std::string>()->default_value(std::string(DATA_DIR) + "configs/test_weighted_area_sampling.toml"))
         ("r,asset_root_dir", "asset root dir", cxxopts::value<std::string>()->default_value(DATA_DIR));
     // clang-format on
     auto args = options.parse(argc, argv);

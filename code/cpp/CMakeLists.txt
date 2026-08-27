@@ -50,7 +50,7 @@ set(DMAP_SHADER_DIR ${CMAKE_SOURCE_DIR}/src/shaders)
 set(COMMON_COMPILE_DEFS
   -DVK_NO_PROTOTYPES
   -DPPK_ASSERT_ENABLED=1
-  -DDATA_DIR=\"${CMAKE_SOURCE_DIR}/data/\"
+  -DDATA_DIR=\"${CMAKE_SOURCE_DIR}/../data/\"
   -DKS_SHADER_DIR=\"${KS_SHADER_DIR}\"
   -DSHADER_DIR=\"${DMAP_SHADER_DIR}\"
 )
@@ -222,4 +222,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   add_custom_command(TARGET dmap POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/src/ks/deps/slang/bin/slang.dll $<TARGET_FILE_DIR:dmap>
   )
+  add_custom_command(TARGET dmap POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/src/ks/deps/slang/bin/slang-compiler.dll $<TARGET_FILE_DIR:dmap>
+  )    
 endif()
