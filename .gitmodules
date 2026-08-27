@@ -1,6 +1,6 @@
 [submodule "implicit-uniform-sampler"]
-	path = implicit-uniform-sampler
+	path = code/third-party/implicit-uniform-sampler
 	url = git@github.com:iszihan/implicit-uniform-sampler.git
 [submodule "pbrt-v4"]
-	path = pbrt-v4
+	path = code/third-party/pbrt-v4
 	url = https://github.com/mmp/pbrt-v4.git

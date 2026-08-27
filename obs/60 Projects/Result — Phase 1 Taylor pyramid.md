@@ -6,7 +6,7 @@ created: 2026-08-26
 
 # Result — Phase 1 Taylor pyramid
 
-Phase 1 of [[Project — Conservative metric queries without tessellation]]: the Taylor-model bound pyramid ([[Taylor-model bound pyramid]]), its propagation to certified metric bounds, and the tightness kill-test with ablations. Code in `C:\dmap\code` (`dmapref/affine.py`, `pyramid.py`, `node_bounds.py`, `dense_reference.py`; experiments 5–7; 24 unit tests pass). Full experiment logs and figures in `code/experiments/out/`.
+Phase 1 of [[Project — Conservative metric queries without tessellation]]: the Taylor-model bound pyramid ([[Taylor-model bound pyramid]]), its propagation to certified metric bounds, and the tightness kill-test with ablations. Code in `C:\dmap\code\python\poc` (`dmapref/affine.py`, `pyramid.py`, `node_bounds.py`, `dense_reference.py`; experiments 5–7; 24 unit tests pass). Full experiment logs and figures in `code/python/poc/experiments/out/`.
 
 ## Verdict up front
 

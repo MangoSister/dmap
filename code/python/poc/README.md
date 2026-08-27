@@ -1,7 +1,7 @@
 # Numpy reference for conservative metric queries
 
 Phase 0–1 reference implementation for the project in
-`../obs/60 Projects/Project — Conservative metric queries without tessellation.md`.
+`../../../obs/60 Projects/Project — Conservative metric queries without tessellation.md`.
 This code is the correctness oracle for the later C++ core. Clarity over speed.
 
 ## Setup
@@ -32,11 +32,11 @@ On this machine conda is not on PATH; use the interpreter directly:
   - `dense_reference.py` — vectorized pointwise truth and per-cell range reductions for the tightness study
 - `experiments/` — one script per question (Phase 0: exp01–04, Phase 1: exp05–07); each prints a verdict and saves figures to `experiments/out/`
 - `tests/` — pytest sanity checks from the notes
-- `data/simple/` — meshes and displacement maps
+- `../../data/simple/` — meshes and displacement maps (shared, outside this package)
 
 ## Run
 
-From `C:\dmap\code`:
+From `C:\dmap\code\python\poc`:
 
 ```
 C:\Users\yyp05\miniconda3\envs\dmap\python.exe -m pytest tests
