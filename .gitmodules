@@ -4,3 +4,6 @@
 [submodule "pbrt-v4"]
 	path = code/third-party/pbrt-v4
 	url = https://github.com/mmp/pbrt-v4.git
+[submodule "code/cpp/src/ks"]
+	path = code/cpp/src/ks
+	url = git@github.com:MangoSister/keepsake.git
