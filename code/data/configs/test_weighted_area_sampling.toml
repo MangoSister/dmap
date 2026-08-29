@@ -1,2 +1,34 @@
 [[task]]
 type = "test_weighted_area_sampling"
+mesh = "simple/cc_torus.obj"
+texture = "simple/disp_rock.png"
+tex_nodes = 65
+n_tess = 64
+triangle_index = -1
+amplitudes = [0.05, 0.2]
+n_dirs = 4
+distances = [0.6, 2.0, 8.0]
+n_samples = 262144
+n_samples_recv = 65536
+n_lines = 1048576
+occlusion = true
+n_samples_occ = 131072
+beta = 0.05
+seed = 2027
+
+[[task]]
+type = "test_weighted_area_sampling"
+mesh = "simple/cc_torus.obj"
+texture = "simple/disp_cobble.png"
+tex_nodes = 65
+n_tess = 64
+triangle_index = -1
+amplitudes = [0.05, 0.2]
+n_dirs = 4
+distances = [0.6, 2.0, 8.0]
+n_samples = 262144
+n_samples_recv = 65536
+n_lines = 1048576
+occlusion = false
+beta = 0.05
+seed = 2027

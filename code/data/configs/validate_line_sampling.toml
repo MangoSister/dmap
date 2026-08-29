@@ -1,0 +1,12 @@
+[[task]]
+type = "validate_line_sampling"
+mesh = "simple/cc_torus.obj"
+texture = "simple/disp_rock.png"
+amplitude = 0.05
+tex_nodes = 257
+n_tess = 32
+n_triangles = 8
+t_start = 0
+n_lines = 4000000
+tv_threshold = 0.1
+seed = 2027

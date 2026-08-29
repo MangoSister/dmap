@@ -181,7 +181,32 @@ set(IMGUI_SRC
 )
 
 set(DMAP_SRC
-  src/main.cpp  
+  src/main.cpp
+  src/displaced_surface.h
+  src/displaced_surface.cpp
+  src/base_mesh.h
+  src/base_mesh.cpp
+  src/texture_grid.h
+  src/texture_grid.cpp
+  src/displaced_tessellation.h
+  src/displaced_tessellation.cpp
+  src/taylor_pyramid.h
+  src/taylor_pyramid.cpp
+  src/line_sampling.h
+  src/line_sampling.cpp
+  src/bilinear_patch.h
+  src/bilinear_patch.cpp
+  src/descent_sampler.h
+  src/descent_sampler.cpp
+  src/displaced_emitter_light.h
+  src/displaced_emitter_light.cpp
+  src/render_displaced_emitter.cpp
+  src/validate_pointwise.cpp
+  src/validate_bilinear_patch.cpp
+  src/validate_pyramid.cpp
+  src/validate_line_sampling.cpp
+  src/validate_tessellation.cpp
+  src/validate_descent.cpp
   src/test_weighted_area_sampling.cpp
 )
 

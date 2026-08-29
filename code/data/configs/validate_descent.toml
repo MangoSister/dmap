@@ -1,0 +1,13 @@
+[[task]]
+type = "validate_descent"
+mesh = "simple/cc_torus.obj"
+texture = "simple/disp_rock.png"
+tex_nodes = 65
+amplitude = 0.2
+triangle_index = -1
+n_samples = 500000
+n_samples_hist = 2000000
+n_samples_pdf = 200000
+beta = 0.05
+tv_threshold = 0.05
+seed = 2027
