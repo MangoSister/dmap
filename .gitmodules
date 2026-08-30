@@ -7,3 +7,6 @@
 [submodule "code/cpp/src/ks"]
 	path = code/cpp/src/ks
 	url = git@github.com:MangoSister/keepsake.git
+[submodule "code/third-party/GfxExp"]
+	path = code/third-party/GfxExp
+	url = git@github.com:shocker-0x15/GfxExp.git
