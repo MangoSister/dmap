@@ -290,6 +290,7 @@ void render_displaced_emitter(const ConfigArgs &args, const fs::path &task_dir, 
     int triangle_index = args.load_integer("triangle_index", -1);
     int n_tess = args.load_integer("n_tess", 128);
     double beta = (double)args.load_float("beta", 0.05f);
+    dmap::PyramidBuild build = dmap::pyramid_build_from_string(args.load_string("pyramid_build", "fold"));
     double emission_scale = (double)args.load_float("emission_scale", 8.0f);
     double albedo = (double)args.load_float("albedo", 0.7f);
     double floor_offset = (double)args.load_float("floor_offset", 1.2f);
@@ -367,7 +368,7 @@ void render_displaced_emitter(const ConfigArgs &args, const fs::path &task_dir, 
         {dmap::EmitterSamplerKind::ProductDescent, "product-descent"},
         {dmap::EmitterSamplerKind::ReceiverDescent, "receiver-descent"},
     };
-    dmap::DisplacedEmitterLight light_prod(tri, field, em, dmap::EmitterSamplerKind::ProductDescent, beta);
+    dmap::DisplacedEmitterLight light_prod(tri, field, em, dmap::EmitterSamplerKind::ProductDescent, beta, build);
 
     RenderSetup setup;
     setup.scene = &scene;
@@ -440,7 +441,7 @@ void render_displaced_emitter(const ConfigArgs &args, const fs::path &task_dir, 
                 << std::abs(lum - ref_lum) / ref_lum << "\n";
         }
         for (auto [kind, name] : ladder) {
-            dmap::DisplacedEmitterLight light(tri, field, em, kind, beta);
+            dmap::DisplacedEmitterLight light(tri, field, em, kind, beta, build);
             RenderSetup s2 = setup;
             s2.light = &light;
             std::vector<vec3d> img = render(s2, camera, Strategy::NEE, width, height, spp_ladder, 3000 + (int)kind);

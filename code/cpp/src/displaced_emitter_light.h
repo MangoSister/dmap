@@ -55,7 +55,7 @@ struct DisplacedEmitterLight
     std::unique_ptr<TexelTableSampler> table;
 
     DisplacedEmitterLight(const BaseTriangle &tri, const HeightGrid &field, const TextureGrid &emission,
-                          EmitterSamplerKind kind, double beta);
+                          EmitterSamplerKind kind, double beta, PyramidBuild build = PyramidBuild::Fold);
 
     double Le_at(double u, double v) const;
 

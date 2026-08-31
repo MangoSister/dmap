@@ -2,6 +2,7 @@
 metric bounds ("Taylor-model bound pyramid" §3, §4, §6)."""
 
 import numpy as np
+import pytest
 
 from dmapref.dense_reference import (bilinear_grid, cell_sample_points,
                                      level_ranges, pointwise_fields)
@@ -10,7 +11,8 @@ from dmapref.metric import metric_at
 from dmapref.node_bounds import (boxed_forms, cell_enclosure,
                                  propagate_affine, propagate_interval,
                                  taylor_forms, taylor_intervals)
-from dmapref.pyramid import MinMaxPyramid, TaylorPyramid, minmax_from_taylor
+from dmapref.pyramid import (BUILDS, CHANNELS, MinMaxPyramid, TaylorPyramid,
+                             minmax_from_taylor)
 from dmapref.synthetic import face_normal_triangle, random_oblique_triangle
 
 RNG = np.random.default_rng(11)
@@ -29,10 +31,10 @@ def containing_cell(pyr, level, X, Y):
     return ci, cj
 
 
-def assert_node_containment(values, scale, tol=1e-10):
-    """Dense h and gradient samples lie inside every ancestor node's slab
-    and gradient intervals."""
-    pyr = TaylorPyramid(values, scale)
+def assert_node_containment(values, scale, tol=1e-10, build="fold"):
+    """Dense h and gradient samples lie inside every ancestor node's slab,
+    gradient intervals, and stored height range."""
+    pyr = TaylorPyramid(values, scale, build)
     X, Y = sample_grid(pyr.n_leaf, 5)
     h, hu, hv = bilinear_grid(values, scale, X, Y)
     for level in range(pyr.n_levels):
@@ -45,6 +47,8 @@ def assert_node_containment(values, scale, tol=1e-10):
         assert (np.abs(h - plane) <= lv["r"][cj, ci] + tol).all()
         assert (np.abs(hu - lv["gu"][cj, ci]) <= lv["ru"][cj, ci] + tol).all()
         assert (np.abs(hv - lv["gv"][cj, ci]) <= lv["rv"][cj, ci] + tol).all()
+        assert (h >= lv["h_min"][cj, ci] - tol).all()
+        assert (h <= lv["h_max"][cj, ci] + tol).all()
 
 
 def test_leaf_is_exact():
@@ -73,23 +77,70 @@ def test_leaf_is_exact():
         assert abs(dev_u - leaf["ru"][j, i]) < 1e-6
 
 
-def test_containment_random_texture():
-    assert_node_containment(RNG.random((33, 33)), scale=0.4)
+@pytest.mark.parametrize("build", BUILDS)
+def test_containment_random_texture(build):
+    assert_node_containment(RNG.random((33, 33)), scale=0.4, build=build)
 
 
-def test_containment_step_texture():
+@pytest.mark.parametrize("build", BUILDS)
+def test_containment_step_texture(build):
     """Adversarial child disagreement: a hard step edge."""
     values = np.zeros((17, 17))
     values[:, 9:] = 1.0
-    assert_node_containment(values, scale=1.0)
+    assert_node_containment(values, scale=1.0, build=build)
 
 
-def test_ramp_gives_zero_remainders_and_zero_width_bounds():
+@pytest.mark.parametrize("build", BUILDS)
+def test_stored_height_range_is_the_exact_one(build):
+    """The stored h_min/h_max channel equals the exact min-max pyramid at
+    every level. Bilinear extrema over a texel sit at its corners, so over
+    any union of texels they sit at a node of the union: the min/max fold
+    and direct enumeration are both exact, and must agree bit for bit."""
+    values, scale = RNG.random((33, 33)), 0.4
+    pyr = TaylorPyramid(values, scale, build)
+    mm = MinMaxPyramid(values, scale)
+    for level in range(pyr.n_levels):
+        assert (pyr.levels[level]["h_min"] == mm.levels[level]["h_lo"]).all()
+        assert (pyr.levels[level]["h_max"] == mm.levels[level]["h_hi"]).all()
+
+
+def test_direct_and_fold_differ_only_in_h0_and_r():
+    """Direct enumeration recomputes the whole node, but the fold already
+    gets the gradient hulls and the height range exactly, so those channels
+    must match; only the plane offset and the remainder move, and the
+    remainder can only shrink (the fold compounds its children's)."""
+    values, scale = RNG.random((33, 33)), 0.4
+    fold = TaylorPyramid(values, scale, "fold")
+    direct = TaylorPyramid(values, scale, "direct")
+    for level in range(fold.n_levels):
+        f, d = fold.levels[level], direct.levels[level]
+        for key in ("gu", "gv", "ru", "rv", "h_min", "h_max"):
+            mag = np.maximum(np.abs(f[key]).max(), 1.0)
+            assert np.abs(d[key] - f[key]).max() <= 1e-12 * mag, (key, level)
+        assert (d["r"] <= f["r"] + 1e-15).all()
+        # |h0 shift| <= r_fold - r_direct: both are midpoints of nested
+        # intervals around the same slope.
+        assert (np.abs(d["h0"] - f["h0"]) <= f["r"] - d["r"] + 1e-12).all()
+
+
+def test_direct_leaf_is_the_closed_form_leaf():
+    """At level 0 the enumeration reduces to the four texel corners, which
+    is the closed-form leaf; the two agree to rounding."""
+    values, scale = RNG.random((17, 17)), 0.7
+    fold = TaylorPyramid(values, scale, "fold").levels[0]
+    direct = TaylorPyramid(values, scale, "direct").levels[0]
+    for key in CHANNELS:
+        mag = np.maximum(np.abs(fold[key]).max(), 1.0)
+        assert np.abs(direct[key] - fold[key]).max() <= 1e-12 * mag, key
+
+
+@pytest.mark.parametrize("build", BUILDS)
+def test_ramp_gives_zero_remainders_and_zero_width_bounds(build):
     """A pure plane is explained exactly at every level (note §2); on a
     face-normal triangle the propagated metric bounds collapse to a point."""
     jj, ii = np.mgrid[0:17, 0:17]
     values = 0.3 * ii / 16 - 0.2 * jj / 16
-    pyr = TaylorPyramid(values, scale=1.0)
+    pyr = TaylorPyramid(values, scale=1.0, build=build)
     for lv in pyr.levels:
         assert (lv["r"] < 1e-14).all()
         assert (lv["ru"] < 1e-13).all() and (lv["rv"] < 1e-13).all()

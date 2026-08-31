@@ -1,0 +1,21 @@
+# What the stored min-max height channel and the direct construction buy,
+# and what they cost. Correctness lives in validate_pyramid.
+[[task]]
+type = "test_pyramid_channels"
+mesh = "simple/cc_torus.obj"
+texture = "simple/disp_rock.png"
+tex_nodes = 257
+triangle_index = -1
+amplitudes = [0.05, 0.2]
+tile_sizes = [65, 129, 257]
+n_reps = 10
+
+[[task]]
+type = "test_pyramid_channels"
+mesh = "simple/cc_torus.obj"
+texture = "simple/disp_cobble.png"
+tex_nodes = 257
+triangle_index = -1
+amplitudes = [0.05, 0.2]
+tile_sizes = [65, 129, 257]
+n_reps = 10

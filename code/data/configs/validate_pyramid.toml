@@ -2,5 +2,6 @@
 type = "validate_pyramid"
 golden_dir = "golden/pyramid"
 tolerance = 1e-12
+tolerance_cross = 1e-12
 cells_per_level = 4
 n_samples = 33

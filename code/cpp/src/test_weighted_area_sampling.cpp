@@ -197,6 +197,7 @@ void test_weighted_area_sampling(const ConfigArgs &args, const fs::path &task_di
     bool with_occlusion = args.load_bool("occlusion", false);
     int64_t n_samples_occ = args.load_integer("n_samples_occ", 131072);
     double beta = (double)args.load_float("beta", 0.05f);
+    dmap::PyramidBuild build = dmap::pyramid_build_from_string(args.load_string("pyramid_build", "fold"));
     uint64_t seed = args.load_integer("seed", 2027);
     int m_interior = 8, m_edge = 64; // quadrature points per texel side
 
@@ -232,10 +233,10 @@ void test_weighted_area_sampling(const ConfigArgs &args, const fs::path &task_di
                                   triangle_index, mesh_path.filename().string(), amplitude);
 
         // Samplers.
-        dmap::DescentSampler samp_area(tri, field, em, dmap::DescentWeight::AreaOnly, beta);
-        dmap::DescentSampler samp_prod(tri, field, em, dmap::DescentWeight::Product, beta);
-        dmap::DescentSampler samp_geom(tri, field, em, dmap::DescentWeight::ProductGeometry, beta);
-        dmap::DescentSampler samp_geom_nc(tri, field, em, dmap::DescentWeight::ProductGeometry, beta);
+        dmap::DescentSampler samp_area(tri, field, em, dmap::DescentWeight::AreaOnly, beta, build);
+        dmap::DescentSampler samp_prod(tri, field, em, dmap::DescentWeight::Product, beta, build);
+        dmap::DescentSampler samp_geom(tri, field, em, dmap::DescentWeight::ProductGeometry, beta, build);
+        dmap::DescentSampler samp_geom_nc(tri, field, em, dmap::DescentWeight::ProductGeometry, beta, build);
         samp_geom_nc.emitter_cosine = false;
         dmap::TexelTableSampler table_em(tri, field, em, /*with_metric*/ false);
         dmap::TexelTableSampler table_prod(tri, field, em, /*with_metric*/ true);
@@ -455,13 +456,13 @@ void test_weighted_area_sampling(const ConfigArgs &args, const fs::path &task_di
                 }
                 return best;
             };
-            double t_pyr = time_min([&]() { dmap::TaylorPyramid p(field.values, field.W, field.scale); });
+            double t_pyr = time_min([&]() { dmap::TaylorPyramid p(field.values, field.W, field.scale, build); });
             double t_hier =
-                time_min([&]() { dmap::DescentSampler s(tri, field, em, dmap::DescentWeight::Product, beta); });
+                time_min([&]() { dmap::DescentSampler s(tri, field, em, dmap::DescentWeight::Product, beta, build); });
             double t_table = time_min([&]() { dmap::TexelTableSampler t(tri, field, em, true); });
             size_t mem_hier = 0;
             for (const dmap::TaylorLevel &lvl : samp_prod.pyramid.levels)
-                mem_hier += 6 * lvl.h0.size() * sizeof(double);
+                mem_hier += 8 * lvl.h0.size() * sizeof(double);
             for (const std::vector<double> &lvl : samp_prod.e_sum)
                 mem_hier += lvl.size() * sizeof(double);
             size_t mem_table = table_prod.table.margin.cdf.size() * sizeof(float);

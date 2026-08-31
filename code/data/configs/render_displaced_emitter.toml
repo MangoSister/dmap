@@ -7,6 +7,7 @@ amplitude = 0.2
 triangle_index = -1
 n_tess = 128
 beta = 0.05
+pyramid_build = "fold"
 emission_scale = 8.0
 albedo = 0.7
 floor_offset = 1.2

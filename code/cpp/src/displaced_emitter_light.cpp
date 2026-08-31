@@ -17,9 +17,12 @@ constexpr double min_cos_y = 1e-7;
 } // namespace
 
 DisplacedEmitterLight::DisplacedEmitterLight(const BaseTriangle &tri, const HeightGrid &field,
-                                             const TextureGrid &emission, EmitterSamplerKind kind, double beta)
+                                             const TextureGrid &emission, EmitterSamplerKind kind, double beta,
+                                             PyramidBuild build)
     : tri(&tri), field(field), emission(&emission), kind(kind)
 {
+    // The table kinds ignore the build mode: TexelTableSampler never
+    // touches the pyramid.
     switch (kind) {
     case EmitterSamplerKind::EmissionTable:
         table = std::make_unique<TexelTableSampler>(tri, field, emission, /*with_metric*/ false);
@@ -28,13 +31,13 @@ DisplacedEmitterLight::DisplacedEmitterLight(const BaseTriangle &tri, const Heig
         table = std::make_unique<TexelTableSampler>(tri, field, emission, /*with_metric*/ true);
         break;
     case EmitterSamplerKind::AreaDescent:
-        descent = std::make_unique<DescentSampler>(tri, field, emission, DescentWeight::AreaOnly, beta);
+        descent = std::make_unique<DescentSampler>(tri, field, emission, DescentWeight::AreaOnly, beta, build);
         break;
     case EmitterSamplerKind::ProductDescent:
-        descent = std::make_unique<DescentSampler>(tri, field, emission, DescentWeight::Product, beta);
+        descent = std::make_unique<DescentSampler>(tri, field, emission, DescentWeight::Product, beta, build);
         break;
     case EmitterSamplerKind::ReceiverDescent:
-        descent = std::make_unique<DescentSampler>(tri, field, emission, DescentWeight::ProductGeometry, beta);
+        descent = std::make_unique<DescentSampler>(tri, field, emission, DescentWeight::ProductGeometry, beta, build);
         descent->emitter_cosine = false; // S7: the midpoint cosine estimate is harmful
         break;
     }

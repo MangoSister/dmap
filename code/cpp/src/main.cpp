@@ -43,6 +43,7 @@ DECLARE_TASK(test_weighted_area_sampling);
 DECLARE_TASK(validate_pointwise);
 DECLARE_TASK(validate_tessellation);
 DECLARE_TASK(validate_pyramid);
+DECLARE_TASK(test_pyramid_channels);
 DECLARE_TASK(validate_line_sampling);
 DECLARE_TASK(validate_bilinear_patch);
 DECLARE_TASK(validate_descent);
@@ -123,6 +124,7 @@ int main(int argc, char *argv[])
     cfg.register_task("validate_pointwise", validate_pointwise);
     cfg.register_task("validate_tessellation", validate_tessellation);
     cfg.register_task("validate_pyramid", validate_pyramid);
+    cfg.register_task("test_pyramid_channels", test_pyramid_channels);
     cfg.register_task("validate_line_sampling", validate_line_sampling);
     cfg.register_task("validate_bilinear_patch", validate_bilinear_patch);
     cfg.register_task("validate_descent", validate_descent);

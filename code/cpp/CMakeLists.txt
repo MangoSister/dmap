@@ -204,6 +204,7 @@ set(DMAP_SRC
   src/validate_pointwise.cpp
   src/validate_bilinear_patch.cpp
   src/validate_pyramid.cpp
+  src/test_pyramid_channels.cpp
   src/validate_line_sampling.cpp
   src/validate_tessellation.cpp
   src/validate_descent.cpp

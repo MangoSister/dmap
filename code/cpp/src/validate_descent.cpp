@@ -125,6 +125,7 @@ void validate_descent(const ConfigArgs &args, const fs::path &task_dir, int task
     int64_t n_samples_hist = args.load_integer("n_samples_hist", 2000000);
     int64_t n_samples_pdf = args.load_integer("n_samples_pdf", 200000);
     double beta = (double)args.load_float("beta", 0.05f);
+    dmap::PyramidBuild build = dmap::pyramid_build_from_string(args.load_string("pyramid_build", "fold"));
     double tv_threshold = (double)args.load_float("tv_threshold", 0.05f);
     uint64_t seed = args.load_integer("seed", 2027);
     int m_interior = 8, m_edge = 128; // quadrature points per texel side
@@ -167,10 +168,10 @@ void validate_descent(const ConfigArgs &args, const fs::path &task_dir, int task
         return std::max(recv.n.dot(omega), 0.0) * std::abs(f.n.normalized().dot(omega)) / r2;
     };
 
-    dmap::DescentSampler samp_area(tri, field, em_spot, dmap::DescentWeight::AreaOnly, beta);
-    dmap::DescentSampler samp_prod(tri, field, em_spot, dmap::DescentWeight::Product, beta);
-    dmap::DescentSampler samp_geom(tri, field, em_spot, dmap::DescentWeight::ProductGeometry, beta);
-    dmap::DescentSampler samp_zero(tri, field, em_zero, dmap::DescentWeight::Product, beta);
+    dmap::DescentSampler samp_area(tri, field, em_spot, dmap::DescentWeight::AreaOnly, beta, build);
+    dmap::DescentSampler samp_prod(tri, field, em_spot, dmap::DescentWeight::Product, beta, build);
+    dmap::DescentSampler samp_geom(tri, field, em_spot, dmap::DescentWeight::ProductGeometry, beta, build);
+    dmap::DescentSampler samp_zero(tri, field, em_zero, dmap::DescentWeight::Product, beta, build);
     dmap::TexelTableSampler table_em(tri, field, em_spot, /*with_metric*/ false);
     dmap::TexelTableSampler table_prod(tri, field, em_spot, /*with_metric*/ true);
 
@@ -250,7 +251,7 @@ void validate_descent(const ConfigArgs &args, const fs::path &task_dir, int task
                                 vec3d(0, 0, 1));
         std::vector<double> flat_values((size_t)tex_nodes * tex_nodes, 0.4);
         dmap::HeightGrid flat_field{tex_nodes, tex_nodes, 0.1, flat_values.data()};
-        dmap::DescentSampler flat_desc(flat, flat_field, em_spot, dmap::DescentWeight::Product, 0.0);
+        dmap::DescentSampler flat_desc(flat, flat_field, em_spot, dmap::DescentWeight::Product, 0.0, build);
         dmap::TexelTableSampler flat_table(flat, flat_field, em_spot, /*with_metric*/ true);
 
         double e_root = flat_desc.e_sum.back()[0];

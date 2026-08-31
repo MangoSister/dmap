@@ -20,8 +20,9 @@ double clipped_cell_area(double u0, double v0, double w)
 }
 
 DescentSampler::DescentSampler(const BaseTriangle &tri, const HeightGrid &field, const TextureGrid &emission,
-                               DescentWeight variant, double beta)
-    : tri(&tri), field(field), variant(variant), beta(beta), pyramid(field.values, field.W, field.scale)
+                               DescentWeight variant, double beta, PyramidBuild build)
+    : tri(&tri), field(field), variant(variant), beta(beta), build(build),
+      pyramid(field.values, field.W, field.scale, build)
 {
     ASSERT(field.W == field.H, "descent sampler needs a square node grid");
     ASSERT(emission.W == pyramid.n_leaf && emission.H == pyramid.n_leaf,

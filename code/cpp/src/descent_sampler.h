@@ -21,6 +21,13 @@
 // evaluated pointwise at the sample. Weights only steer variance; any
 // strictly positive weights on cells that hold target mass give an unbiased
 // sampler.
+//
+// The pyramid's construction (PyramidBuild) is therefore free to change:
+// the weights read h0, gu, gv and never a remainder, admissibility comes
+// from the emission sum, and both pdf paths evaluate the height field. It
+// is part of the sampler's identity for MIS all the same — the sample side
+// and the query side must use the same construction, or the re-walked pdf
+// disagrees, exactly as with beta.
 
 namespace dmap
 {
@@ -70,6 +77,11 @@ struct DescentSampler
     // node's midpoint normal) in the weight. On rough content the midpoint
     // normal summarizes a coarse cell badly, so S7 measures both settings.
     bool emitter_cosine = true;
+    // Construction of the bound pyramid. Fold is the default, so the S4-S8
+    // measurements are reproduced unchanged; Direct gives a tighter
+    // remainder and a slightly different h0, hence slightly different
+    // weights (unbiased either way).
+    PyramidBuild build = PyramidBuild::Fold;
 
     TaylorPyramid pyramid;
     // Emission sum pyramid (§5A: "a sum pyramid of E is exact at texel
@@ -81,7 +93,7 @@ struct DescentSampler
 
     // emission must be an n_leaf x n_leaf texel grid matching field's cells.
     DescentSampler(const BaseTriangle &tri, const HeightGrid &field, const TextureGrid &emission, DescentWeight variant,
-                   double beta);
+                   double beta, PyramidBuild build = PyramidBuild::Fold);
 
     DescentSample sample(ks::RNG &rng, const Receiver *receiver = nullptr) const;
     // Query-side pdf for MIS: re-walks the branch probabilities of the leaf
