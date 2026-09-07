@@ -2,7 +2,7 @@
 title: "Application 2 — Tessellation-free ray tracing with event-segmented shell rays"
 tags: [paper, application-2, ray-tracing, displacement-maps, first-order, dda]
 status: maintained-draft
-evidence-cutoff: P30
+evidence-cutoff: P31
 updated: 2026-09-07
 ---
 
@@ -11,7 +11,7 @@ updated: 2026-09-07
 > **Status and intended use.** This is the maintained Markdown chapter for the
 > ray-tracing application of the eventual three-application first-order
 > representation paper. It synthesizes the preserved implementation and
-> measurements through P30. It does not replace or overwrite the standalone
+> measurements through P31. It does not replace or overwrite the standalone
 > [LaTeX ray-tracing draft](../../../../paper_dmap_query/ray-tracing-only-draft.tex).
 > Numbers are attached to their frozen reports, and statements labeled as
 > interpretation or open work are not experimental facts.
@@ -918,6 +918,39 @@ The complete image inventory, hashes, and figure-use guidance are in the
 P30 commands and scene records are in the
 [P30 report](../../../../experiments/p30_coarse_mesh_references/report.json).
 
+### 14.7 P31 purchased-material shape expansion
+
+P31 adds four purchased 4K displacement/PBR materials on four deliberately
+different proxies: a rounded sci-fi reactor capsule, an open dry-branches
+saddle, a rounded-square quilt cushion, and a tapered wood-block reliquary.
+Every scene has an editable Blender lighting file, a renderer-exported
+three-light rig, a matched Mode 0/candidate quality audit, a standalone 256-spp
+candidate image, and a separately rendered undeformed proxy reference.
+
+Some art-direction runs overlapped on the same GPU, so paper-facing timing was
+repeated afterward as a strictly sequential, uncontended 1280x1024 sweep. Each
+arm uses 10 warm-up and 30 measured frames, path length three, the same scene
+and executable, and no candidate-only arguments. All four candidates use
+tagged first-order primary bounds, first-order outgoing bounds, event-segmented
+linear shell rays, and front-to-back DDA without nonlinear fallback.
+
+| Scene | Mode 0 | Ours | Speedup | Beauty PSNR | Mask mismatch |
+|---|---:|---:|---:|---:|---:|
+| Sci-fi reactor | 17.635 ms | 9.705 ms | **1.817x** | 47.080 dB | 0.000229% |
+| Dry-branches ground | 24.132 ms | 11.169 ms | **2.161x** | 50.719 dB | 0.028763% |
+| Quilt cushion | 16.116 ms | 10.135 ms | **1.590x** | 51.884 dB | 0.000076% |
+| Wood-block reliquary | 17.921 ms | 10.877 ms | **1.648x** | 37.212 dB | 0.011063% |
+
+The four-scene geometric-mean speedup is **1.791x** overall, **1.684x** in the
+G-buffer, and **1.835x** in path tracing. These artist-directed cases expand
+shape and material diversity but do not replace the 247-pair P23 aggregate.
+The wood-block case is the weakest quality example: its small position/normal
+tails coexist with sparse high-contrast visibility differences, so its
+37.212-dB result should be shown with the registered difference image rather
+than described as exact agreement. Full provenance is in the
+[P31 summary](../../../../docs/p31_purchased_beauties_summary.md) and
+[uncontended timing directory](../../../../experiments/p31_uncontended_sequential_10x30_1280x1024).
+
 ## 15. Ablations and mechanism evidence
 
 ### 15.1 Where the full speedup comes from
@@ -989,7 +1022,8 @@ the pruning mechanism; they are not standalone performance ratios.
 | Broad performance | [P23 matrix PDF](../../../../figures/ray_tracing_paper/rt_p23_performance_matrix.pdf) | Shows speed regimes and regressions |
 | Accuracy | [P23 agreement PDF](../../../../figures/ray_tracing_paper/rt_p23_render_agreement.pdf) | Paired representative render/AOV evidence |
 | Hero row | [standalone beauty directory](../../../../figures/paper_beauty_ours/README.md) | Use individual unlabelled ours images, not montages |
-| Tessellation-free input explanation | [P30 coarse report](../../../../experiments/p30_coarse_mesh_references/report.json) | Place coarse proxy beside displaced beauty |
+| Tessellation-free input explanation | [P30 coarse report](../../../../experiments/p30_coarse_mesh_references/report.json) and [P31 coarse report](../../../../experiments/p31_coarse_mesh_references/report_p31.json) | Place coarse proxy beside displaced beauty |
+| New material quartet | [P31 summary](../../../../docs/p31_purchased_beauties_summary.md) | Sci-fi/reliquary above, quilt/branches below; capsule and cushion are the clearest base/result pairs |
 
 The PNG versions are convenient for Markdown and slides; use PDF/SVG in the
 paper. The source generator is
@@ -1076,9 +1110,9 @@ the incremental first-order benefit. A new output directory is intentional.
 ```
 
 The first command checks the common 30-case TFDM-eligible manifest. The latter
-two regenerate/validate the explanatory figures and the seven undeformed proxy
-references. Exact artist-scene rendering commands live in the P26–P29 documents
-linked in Section 14.6; keeping them there avoids silently simplifying their
+two regenerate/validate the explanatory figures and all eleven undeformed proxy
+references. Exact artist-scene rendering commands live in the P26–P31 documents
+linked in Sections 14.6–14.7; keeping them there avoids silently simplifying their
 camera, material, light, and sampling contracts.
 
 ### 18.4 Manuscript build
@@ -1194,7 +1228,11 @@ outgoing-only result; P22 supplies the current all-ray causal number.
 Artist-scene provenance is in the P26–P29 notes linked in Section 14.6; P30 is
 represented by the [machine-readable report](../../../../experiments/p30_coarse_mesh_references/report.json),
 [render script](../../../../scripts/render_paper_coarse_meshes.py), and
-[image inventory](../../../../figures/paper_beauty_ours/README.md).
+[image inventory](../../../../figures/paper_beauty_ours/README.md). P31 adds the
+[purchased-material inventory](../../../../docs/p31_purchased_material_inventory.md),
+[integrated scene report](../../../../docs/p31_purchased_beauties_summary.md),
+[uncontended timing artifacts](../../../../experiments/p31_uncontended_sequential_10x30_1280x1024),
+and [four-scene coarse report](../../../../experiments/p31_coarse_mesh_references/report_p31.json).
 
 Maintenance rules:
 
