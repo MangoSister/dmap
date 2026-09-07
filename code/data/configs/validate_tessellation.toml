@@ -1,0 +1,23 @@
+[[task]]
+type = "validate_tessellation"
+mesh = "simple/cc_torus.obj"
+texture = "simple/disp_rock.png"
+tex_nodes = 33
+levels = [4, 8, 16, 32, 64]
+amplitudes = [0.05, 0.2]
+n_triangles = 8
+n_quad = 512
+max_final_error = 0.05
+save_obj = true
+
+[[task]]
+type = "validate_tessellation"
+mesh = "simple/spot.obj"
+texture = "simple/disp_cobble.png"
+tex_nodes = 33
+levels = [4, 8, 16, 32, 64]
+amplitudes = [0.05, 0.2]
+n_triangles = 8
+n_quad = 512
+max_final_error = 0.05
+save_obj = true

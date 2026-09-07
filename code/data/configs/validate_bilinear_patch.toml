@@ -1,0 +1,6 @@
+[[task]]
+type = "validate_bilinear_patch"
+tex_n = 64
+n_samples = 2000000
+tv_threshold = 0.05
+seed = 2027

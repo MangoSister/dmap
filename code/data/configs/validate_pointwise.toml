@@ -1,0 +1,4 @@
+[[task]]
+type = "validate_pointwise"
+golden_dir = "golden/pointwise"
+tolerance = 1e-9

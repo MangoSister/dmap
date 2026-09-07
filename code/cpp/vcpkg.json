@@ -1,0 +1,67 @@
+{
+    "dependencies": [
+        "eigen3",
+        "tbb",
+        "embree3",
+        "lz4",
+        "vulkan",
+        "vulkan-headers",
+        "vulkan-loader",
+        "vulkan-utility-libraries",
+        "vulkan-memory-allocator",
+        "volk",
+        "glfw3",
+        "freetype",
+        "tinyply",
+        "nlohmann-json",
+        "nanoflann",
+        "matajoh-libnpy"
+    ],
+    "builtin-baseline": "96b5ced82828ecaf67e6010a892c98d3e96ed1c2",
+    "overrides": [
+        { 
+            "name": "embree3", 
+            "version": "3.13.5#4"
+        },        
+        {
+            "name": "vulkan",
+            "version": "2023-12-17"
+        },
+        {
+            "name": "vulkan-headers",
+            "version": "1.4.309.0"
+        },
+        {
+            "name": "vulkan-loader",
+            "version": "1.4.309.0"
+        }, 
+        {
+            "name": "vulkan-utility-libraries",
+            "version": "1.4.309.0"
+        },
+        {
+            "name": "vulkan-memory-allocator",
+            "version": "3.3.0"
+        },        
+        {
+            "name": "volk",
+            "version": "1.4.309.0"
+        },
+        {
+            "name": "tinyply",
+            "version": "2.3.4"
+        },
+        {
+            "name": "nlohmann-json",
+            "version": "3.12.0"
+        },
+        {
+            "name": "nanoflann",
+            "version": "1.7.1"
+        },
+        {
+            "name": "matajoh-libnpy",
+            "version": "1.5.3"
+        }
+    ]
+}

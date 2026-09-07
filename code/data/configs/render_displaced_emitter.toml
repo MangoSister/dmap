@@ -1,0 +1,26 @@
+[[task]]
+type = "render_displaced_emitter"
+mesh = "simple/cc_torus.obj"
+texture = "simple/disp_rock.png"
+tex_nodes = 65
+amplitude = 0.2
+triangle_index = -1
+n_tess = 128
+beta = 0.05
+pyramid_build = "fold"
+emission_scale = 8.0
+albedo = 0.7
+floor_offset = 1.2
+floor_extent = 6.0
+width = 384
+height = 288
+vfov = 40.0
+# camera positions and targets in the triangle frame (t1, t2, n), mean-edge units
+cam1_pos = [2.4, 1.5, 1.6]
+cam1_target = [0.0, 0.0, -0.8]
+cam2_pos = [2.4, -0.8, -0.5]
+cam2_target = [0.0, -0.1, -1.0]
+spp_check = 64
+spp_ladder = 16
+spp_ref = 1024
+mis_tolerance = 0.02
