@@ -3,12 +3,20 @@ title: Guide — Eurographics paper draft
 tags: [writing-guide, eurographics, paper, theory, experiments, ablations]
 status: active
 created: 2026-08-23
-updated: 2026-08-24
+updated: 2026-09-07
 parent: "[[Project — Conservative first-order queries on displacement maps]]"
 authoring-model: user-writes-full-draft
 ---
 
 # Guide — Eurographics paper draft
+
+> [!important] Current application organization — 2026-09-07
+> The maintained authoring order is **Application 1: Area/Sampling**,
+> **Application 2: Ray Tracing**, and **Application 3: pending**. The complete
+> ray-tracing record through P30 is [[Paper — Application 2 — Tessellation-free
+> ray tracing]]. Older ray-first numbering and earlier negative checkpoints are
+> retained as development history; they do not override the current chapter or
+> its later frozen evidence.
 
 > [!success] P19 ray-only first-order evidence — 2026-09-05
 > P19 now supplies the previously missing same-renderer scalar/first-order

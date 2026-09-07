@@ -3,11 +3,19 @@ title: Project — Conservative first-order queries on displacement maps
 tags: [project, displacement, conservative-bounds, taylor-model, ray-tracing, area-sampling, closest-point, tessellation-free]
 status: shared-thesis-failed-ray-acceleration-reopened
 created: 2026-08-16
-updated: 2026-09-05
+updated: 2026-09-07
 target-venue: TBD (Eurographics / SIGGRAPH Asia)
 ---
 
 # Project — Conservative first-order queries on displacement maps
+
+> [!important] Maintained paper map — 2026-09-07
+> The current paper organization is **Application 1: Area/Sampling**,
+> **Application 2: Ray Tracing**, and **Application 3: pending**. Use
+> [[Paper — Application 2 — Tessellation-free ray tracing]] as the maintained
+> ray chapter through P30. Earlier notes may number ray tracing first and record
+> superseded negative architectures; preserve them for provenance, but do not
+> use their numbering or conclusions as the current paper state.
 
 > [!success] P19 residual-gated ray acceleration — 2026-09-05
 > The later full-renderer P19 architecture reopens a narrow ray-only result
