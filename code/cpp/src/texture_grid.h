@@ -20,6 +20,12 @@ struct TextureGrid
 TextureGrid load_height_texture(const fs::path &path);
 TextureGrid downsample_box(const TextureGrid &tex, int n);
 
+// Texels to the (W + 1) x (H + 1) node grid of a tile: texel values are
+// node values, and the closing row and column repeat the first texel under
+// repeat (a periodic tile) or duplicate the last under clamp. A 2^L-texel
+// texture gives 2^L leaf cells (plan D6).
+TextureGrid close_tile(const TextureGrid &texels, bool repeat);
+
 // Procedural test maps (no emission assets exist yet; plan phase S5).
 // checkerboard: cells x cells alternating lo/hi over an n x n grid.
 TextureGrid checkerboard(int n, int cells, double lo, double hi);

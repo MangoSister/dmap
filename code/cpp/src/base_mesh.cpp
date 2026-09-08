@@ -6,6 +6,7 @@
 namespace dmap
 {
 
+using ks::vec2d;
 using ks::vec3d;
 
 BaseTriangle BaseMesh::triangle(int t) const
@@ -16,21 +17,34 @@ BaseTriangle BaseMesh::triangle(int t) const
                         normals[ni[2]]);
 }
 
+BaseTriangle BaseMesh::triangle_chart(int t) const
+{
+    const Eigen::Vector3i &vi = faces[t];
+    const Eigen::Vector3i &ni = face_normal_indices[t];
+    const Eigen::Vector3i &ti = face_texcoord_indices[t];
+    ASSERT(has_texcoords() && ti.minCoeff() >= 0, "triangle %d has no texture coordinates", t);
+    return BaseTriangle(positions[vi[0]], positions[vi[1]], positions[vi[2]], normals[ni[0]], normals[ni[1]],
+                        normals[ni[2]], texcoords[ti[0]], texcoords[ti[1]], texcoords[ti[2]]);
+}
+
 namespace
 {
 
 // OBJ face corner 'v', 'v/t', 'v//n', or 'v/t/n' to 0-based indices;
 // missing entries are -1.
-void parse_corner(const std::string &token, int &v, int &n)
+void parse_corner(const std::string &token, int &v, int &t, int &n)
 {
     size_t s1 = token.find('/');
     v = std::stoi(token.substr(0, s1)) - 1;
+    t = -1;
     n = -1;
     if (s1 != std::string::npos) {
         size_t s2 = token.find('/', s1 + 1);
-        if (s2 != std::string::npos && s2 + 1 < token.size()) {
+        std::string t_str = token.substr(s1 + 1, s2 == std::string::npos ? std::string::npos : s2 - s1 - 1);
+        if (!t_str.empty())
+            t = std::stoi(t_str) - 1;
+        if (s2 != std::string::npos && s2 + 1 < token.size())
             n = std::stoi(token.substr(s2 + 1)) - 1;
-        }
     }
 }
 
@@ -68,22 +82,31 @@ BaseMesh load_base_obj(const fs::path &path)
             double x, y, z;
             ss >> x >> y >> z;
             mesh.positions.emplace_back(x, y, z);
+        } else if (head == "vt") {
+            double s, t;
+            ss >> s >> t;
+            mesh.texcoords.emplace_back(s, t);
         } else if (head == "vn") {
             double x, y, z;
             ss >> x >> y >> z;
             mesh.normals.emplace_back(x, y, z);
             has_vn = true;
         } else if (head == "f") {
-            std::vector<std::pair<int, int>> corners; // (vertex, normal)
+            struct Corner
+            {
+                int v, t, n;
+            };
+            std::vector<Corner> corners;
             std::string token;
             while (ss >> token) {
-                int v, n;
-                parse_corner(token, v, n);
-                corners.emplace_back(v, n);
+                Corner c;
+                parse_corner(token, c.v, c.t, c.n);
+                corners.push_back(c);
             }
             for (size_t k = 1; k + 1 < corners.size(); ++k) { // fan triangulation
-                mesh.faces.emplace_back(corners[0].first, corners[k].first, corners[k + 1].first);
-                mesh.face_normal_indices.emplace_back(corners[0].second, corners[k].second, corners[k + 1].second);
+                mesh.faces.emplace_back(corners[0].v, corners[k].v, corners[k + 1].v);
+                mesh.face_normal_indices.emplace_back(corners[0].n, corners[k].n, corners[k + 1].n);
+                mesh.face_texcoord_indices.emplace_back(corners[0].t, corners[k].t, corners[k + 1].t);
             }
         }
     }

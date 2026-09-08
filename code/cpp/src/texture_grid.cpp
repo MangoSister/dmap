@@ -1,5 +1,6 @@
 #include "texture_grid.h"
 #include "ks/assertion.h"
+#include "ks/image_util.h"
 #include <cmath>
 #include <stb_image.h>
 
@@ -12,7 +13,16 @@ TextureGrid load_height_texture(const fs::path &path)
     int W, H, channels;
     TextureGrid tex;
 
-    if (stbi_is_16_bit(path_str.c_str())) {
+    if (path.extension() == ".exr") {
+        // Linear float values as stored; the mean over up to three channels.
+        std::unique_ptr<float[]> data = ks::load_from_exr(path, 3, W, H);
+        ASSERT(data, "Cannot load texture [%s].", path_str.c_str());
+        tex.W = W;
+        tex.H = H;
+        tex.values.resize((size_t)W * H);
+        for (size_t p = 0; p < (size_t)W * H; ++p)
+            tex.values[p] = (data[p * 3] + data[p * 3 + 1] + data[p * 3 + 2]) / 3.0;
+    } else if (stbi_is_16_bit(path_str.c_str())) {
         stbi_us *data = stbi_load_16(path_str.c_str(), &W, &H, &channels, 0);
         ASSERT(data, "Cannot load texture [%s].", path_str.c_str());
         tex.W = W;
@@ -100,6 +110,22 @@ TextureGrid downsample_box(const TextureGrid &tex, int n)
                 for (int x = 0; x < bw; ++x)
                     sum += tex.values[(size_t)(j * bh + y) * tex.W + (i * bw + x)];
             out.values[(size_t)j * n + i] = sum / (bh * bw);
+        }
+    }
+    return out;
+}
+
+TextureGrid close_tile(const TextureGrid &texels, bool repeat)
+{
+    TextureGrid out;
+    out.W = texels.W + 1;
+    out.H = texels.H + 1;
+    out.values.resize((size_t)out.W * out.H);
+    for (int j = 0; j < out.H; ++j) {
+        int tj = repeat ? j % texels.H : std::min(j, texels.H - 1);
+        for (int i = 0; i < out.W; ++i) {
+            int ti = repeat ? i % texels.W : std::min(i, texels.W - 1);
+            out.values[(size_t)j * out.W + i] = texels.values[(size_t)tj * texels.W + ti];
         }
     }
     return out;

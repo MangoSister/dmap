@@ -1,0 +1,47 @@
+# T2 verification: load every scene of the initial set and describe it.
+# The scene files are prepended (main.cpp, `include`); a task names its
+# scene by the [scene.<name>] key. reference_n_tess builds the
+# pre-tessellated substitutes and compares their area with the metric area.
+include = [
+  "../scenes/s1_triangle.toml",
+  "../scenes/s2_torus_rock.toml",
+  "../scenes/s3_spot_cobble.toml",
+  "../scenes/s4_mixed.toml",
+  "../scenes/s5_blender.toml",
+  "../scenes/s6_scifi.toml",
+  "../scenes/s7_orbit.toml",
+]
+
+[[task]]
+type = "describe_scene"
+scene = "scene.s1"
+reference_n_tess = 64
+
+[[task]]
+type = "describe_scene"
+scene = "scene.s2"
+reference_n_tess = 8
+
+[[task]]
+type = "describe_scene"
+scene = "scene.s3"
+reference_n_tess = 8
+
+[[task]]
+type = "describe_scene"
+scene = "scene.s4"
+reference_n_tess = 8
+
+[[task]]
+type = "describe_scene"
+scene = "scene.s5"
+check_extras = true
+reference_n_tess = 8
+
+[[task]]
+type = "describe_scene"
+scene = "scene.s6"
+
+[[task]]
+type = "describe_scene"
+scene = "scene.s7"

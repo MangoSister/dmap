@@ -1,0 +1,30 @@
+# T7 verification: the regression scene rendered by the changed `small_pt`
+# must reproduce the golden bit for bit. The render keys equal those of
+# regression_small_pt.toml, which made the golden.
+include = ["../scenes/regression_s4_base.toml"]
+
+[[task]]
+type = "validate_small_pt_regression"
+golden = "golden/small_pt/small_pt_spp16.exr"
+object = "mesh_asset.regression_s4_base"
+material = [["material.regression_grey", "material.regression_gold", "material.regression_gold", "material.regression_glow", "material.regression_lamp"]]
+bounces = 4
+render_width = 200
+render_height = 150
+spp = 16
+spp_prog_interval = 16
+rng_seed = 7
+tone_mapper = { type = "aces", exposure = 1.0 }
+
+[task.camera]
+type = "perspective"
+pos = [0.0, 3.0, 7.5]
+target = [0.0, 0.8, 0.0]
+up = [0.0, 1.0, 0.0]
+vfov = 40.0
+aspect = 1.3333333
+
+[task.sky]
+type = "sky"
+map = "simple/env.exr"
+strength = 0.5

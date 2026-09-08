@@ -1,0 +1,30 @@
+# T3 verification: the per-node box and slab tests on the displaced objects
+# of S1 (the experiment triangle, every cell of every level), S2 (the torus
+# with its own layout) and S3 (spot with the tile repeated, cells crossing
+# tile boundaries).
+include = [
+  "../scenes/s1_triangle.toml",
+  "../scenes/s2_torus_rock.toml",
+  "../scenes/s3_spot_cobble.toml",
+]
+
+[[task]]
+type = "validate_node_bounds"
+scene = "scene.s1"
+n_triangles = 0
+samples_per_cell = 16
+seed = 2027
+
+[[task]]
+type = "validate_node_bounds"
+scene = "scene.s2"
+n_triangles = 32
+samples_per_cell = 16
+seed = 2027
+
+[[task]]
+type = "validate_node_bounds"
+scene = "scene.s3"
+n_triangles = 32
+samples_per_cell = 16
+seed = 2027

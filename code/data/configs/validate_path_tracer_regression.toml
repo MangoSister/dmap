@@ -1,0 +1,31 @@
+# T8 verification, check (1): the T7 regression scene through path_trace,
+# no displace entries, against the small_pt golden. The keys equal
+# validate_small_pt_regression's. Run with `dmap -n 1`.
+include = ["../scenes/regression_s4_base.toml"]
+
+[[task]]
+type = "validate_path_tracer"
+check = "regression"
+golden = "golden/small_pt/small_pt_spp16.exr"
+object = "mesh_asset.regression_s4_base"
+material = [["material.regression_grey", "material.regression_gold", "material.regression_gold", "material.regression_glow", "material.regression_lamp"]]
+bounces = 4
+render_width = 200
+render_height = 150
+spp = 16
+spp_prog_interval = 16
+rng_seed = 7
+tone_mapper = { type = "aces", exposure = 1.0 }
+
+[task.camera]
+type = "perspective"
+pos = [0.0, 3.0, 7.5]
+target = [0.0, 0.8, 0.0]
+up = [0.0, 1.0, 0.0]
+vfov = 40.0
+aspect = 1.3333333
+
+[task.sky]
+type = "sky"
+map = "simple/env.exr"
+strength = 0.5

@@ -1,0 +1,31 @@
+# T7, step 0: the regression scene rendered by ks's `small_pt` before any ks
+# file is touched. The image small_pt_spp16.exr of the task directory is
+# stored as code/data/golden/small_pt/small_pt_spp16.exr; the render keys
+# below are repeated in validate_small_pt_regression.toml and must stay
+# equal to them.
+include = ["../scenes/regression_s4_base.toml"]
+
+[[task]]
+type = "small_pt"
+object = "mesh_asset.regression_s4_base"
+material = [["material.regression_grey", "material.regression_gold", "material.regression_gold", "material.regression_glow", "material.regression_lamp"]]
+bounces = 4
+render_width = 200
+render_height = 150
+spp = 16
+spp_prog_interval = 16
+rng_seed = 7
+tone_mapper = { type = "aces", exposure = 1.0 }
+
+[task.camera]
+type = "perspective"
+pos = [0.0, 3.0, 7.5]
+target = [0.0, 0.8, 0.0]
+up = [0.0, 1.0, 0.0]
+vfov = 40.0
+aspect = 1.3333333
+
+[task.sky]
+type = "sky"
+map = "simple/env.exr"
+strength = 0.5
