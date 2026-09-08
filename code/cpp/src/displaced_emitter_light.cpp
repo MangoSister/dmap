@@ -5,6 +5,7 @@
 namespace dmap
 {
 
+using ks::vec2d;
 using ks::vec3d;
 
 namespace
@@ -17,12 +18,10 @@ constexpr double min_cos_y = 1e-7;
 } // namespace
 
 DisplacedEmitterLight::DisplacedEmitterLight(const BaseTriangle &tri, const HeightGrid &field,
-                                             const TextureGrid &emission, EmitterSamplerKind kind, double beta,
-                                             PyramidBuild build)
+                                             const TaylorPyramid &pyramid, const EmissionTile &emission,
+                                             EmitterSamplerKind kind, double beta)
     : tri(&tri), field(field), emission(&emission), kind(kind)
 {
-    // The table kinds ignore the build mode: TexelTableSampler never
-    // touches the pyramid.
     switch (kind) {
     case EmitterSamplerKind::EmissionTable:
         table = std::make_unique<TexelTableSampler>(tri, field, emission, /*with_metric*/ false);
@@ -31,13 +30,13 @@ DisplacedEmitterLight::DisplacedEmitterLight(const BaseTriangle &tri, const Heig
         table = std::make_unique<TexelTableSampler>(tri, field, emission, /*with_metric*/ true);
         break;
     case EmitterSamplerKind::AreaDescent:
-        descent = std::make_unique<DescentSampler>(tri, field, emission, DescentWeight::AreaOnly, beta, build);
+        descent = std::make_unique<DescentSampler>(tri, field, pyramid, emission, DescentWeight::AreaOnly, beta);
         break;
     case EmitterSamplerKind::ProductDescent:
-        descent = std::make_unique<DescentSampler>(tri, field, emission, DescentWeight::Product, beta, build);
+        descent = std::make_unique<DescentSampler>(tri, field, pyramid, emission, DescentWeight::Product, beta);
         break;
     case EmitterSamplerKind::ReceiverDescent:
-        descent = std::make_unique<DescentSampler>(tri, field, emission, DescentWeight::ProductGeometry, beta, build);
+        descent = std::make_unique<DescentSampler>(tri, field, pyramid, emission, DescentWeight::ProductGeometry, beta);
         descent->emitter_cosine = false; // S7: the midpoint cosine estimate is harmful
         break;
     }
@@ -45,25 +44,29 @@ DisplacedEmitterLight::DisplacedEmitterLight(const BaseTriangle &tri, const Heig
 
 double DisplacedEmitterLight::Le_at(double u, double v) const
 {
-    int n = emission->W;
-    int i = std::min((int)(u * n), n - 1), j = std::min((int)(v * n), n - 1);
-    return emission->values[(size_t)j * n + i];
+    int n = emission->n_leaf;
+    return emission->texel((int64_t)std::floor(u * n), (int64_t)std::floor(v * n));
 }
 
-EmitterLightSample DisplacedEmitterLight::sample(const vec3d &p_shade, const vec3d &n_shade, ks::RNG &rng) const
+double DisplacedEmitterLight::mass() const { return descent ? descent->footprint.total_mass : table->total_mass; }
+
+size_t DisplacedEmitterLight::memory_bytes() const { return descent ? descent->memory_bytes() : table->memory_bytes(); }
+
+EmitterLightSample DisplacedEmitterLight::sample(const vec3d &p_shade, const vec3d &n_shade, ks::RNG &rng,
+                                                 const vec2d *u_leaf) const
 {
     EmitterLightSample out;
     double pdf_area_s;
     if (descent) {
         Receiver recv{p_shade, n_shade};
-        DescentSample s = descent->sample(rng, kind == EmitterSamplerKind::ReceiverDescent ? &recv : nullptr);
+        DescentSample s = descent->sample(rng, kind == EmitterSamplerKind::ReceiverDescent ? &recv : nullptr, u_leaf);
         out.u = s.u;
         out.v = s.v;
         out.y = s.p;
         out.n_y = s.n;
         pdf_area_s = s.pdf_area;
     } else {
-        TableSample s = table->sample(rng);
+        TableSample s = table->sample(rng, u_leaf);
         if (!s.in_domain)
             return out; // zero-contribution draw; still counts as a sample
         out.u = s.u;
@@ -79,6 +82,7 @@ EmitterLightSample DisplacedEmitterLight::sample(const vec3d &p_shade, const vec
     double cos_y = std::abs(out.n_y.dot(out.wi));
     if (cos_y < min_cos_y)
         return out;
+    out.pdf_area = pdf_area_s;
     out.pdf_omega = pdf_area_s * out.dist * out.dist / cos_y;
     out.Le = Le_at(out.u, out.v);
     out.ok = true;

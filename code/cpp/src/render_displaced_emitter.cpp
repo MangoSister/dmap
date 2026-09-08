@@ -316,6 +316,8 @@ void render_displaced_emitter(const ConfigArgs &args, const fs::path &task_dir, 
     // Emission: checkerboard with exact-zero cells (structured, and the
     // certified-zero pruning shows up in the picture), scaled to radiance.
     dmap::TextureGrid em = dmap::checkerboard(n_leaf, 8, 0.0, emission_scale);
+    dmap::TaylorPyramid pyramid(field, build);
+    dmap::EmissionTile em_tile(em);
 
     // Triangle frame: t1, t2 in the base plane, nc the displaced-centre
     // normal. All scene placement is in this frame, in mean-edge units.
@@ -368,7 +370,8 @@ void render_displaced_emitter(const ConfigArgs &args, const fs::path &task_dir, 
         {dmap::EmitterSamplerKind::ProductDescent, "product-descent"},
         {dmap::EmitterSamplerKind::ReceiverDescent, "receiver-descent"},
     };
-    dmap::DisplacedEmitterLight light_prod(tri, field, em, dmap::EmitterSamplerKind::ProductDescent, beta, build);
+    dmap::DisplacedEmitterLight light_prod(tri, field, pyramid, em_tile, dmap::EmitterSamplerKind::ProductDescent,
+                                           beta);
 
     RenderSetup setup;
     setup.scene = &scene;
@@ -441,7 +444,7 @@ void render_displaced_emitter(const ConfigArgs &args, const fs::path &task_dir, 
                 << std::abs(lum - ref_lum) / ref_lum << "\n";
         }
         for (auto [kind, name] : ladder) {
-            dmap::DisplacedEmitterLight light(tri, field, em, kind, beta, build);
+            dmap::DisplacedEmitterLight light(tri, field, pyramid, em_tile, kind, beta);
             RenderSetup s2 = setup;
             s2.light = &light;
             std::vector<vec3d> img = render(s2, camera, Strategy::NEE, width, height, spp_ladder, 3000 + (int)kind);

@@ -233,13 +233,15 @@ void test_weighted_area_sampling(const ConfigArgs &args, const fs::path &task_di
                                   triangle_index, mesh_path.filename().string(), amplitude);
 
         // Samplers.
-        dmap::DescentSampler samp_area(tri, field, em, dmap::DescentWeight::AreaOnly, beta, build);
-        dmap::DescentSampler samp_prod(tri, field, em, dmap::DescentWeight::Product, beta, build);
-        dmap::DescentSampler samp_geom(tri, field, em, dmap::DescentWeight::ProductGeometry, beta, build);
-        dmap::DescentSampler samp_geom_nc(tri, field, em, dmap::DescentWeight::ProductGeometry, beta, build);
+        dmap::TaylorPyramid pyramid(field, build);
+        dmap::EmissionTile em_tile(em);
+        dmap::DescentSampler samp_area(tri, field, pyramid, em_tile, dmap::DescentWeight::AreaOnly, beta);
+        dmap::DescentSampler samp_prod(tri, field, pyramid, em_tile, dmap::DescentWeight::Product, beta);
+        dmap::DescentSampler samp_geom(tri, field, pyramid, em_tile, dmap::DescentWeight::ProductGeometry, beta);
+        dmap::DescentSampler samp_geom_nc(tri, field, pyramid, em_tile, dmap::DescentWeight::ProductGeometry, beta);
         samp_geom_nc.emitter_cosine = false;
-        dmap::TexelTableSampler table_em(tri, field, em, /*with_metric*/ false);
-        dmap::TexelTableSampler table_prod(tri, field, em, /*with_metric*/ true);
+        dmap::TexelTableSampler table_em(tri, field, em_tile, /*with_metric*/ false);
+        dmap::TexelTableSampler table_prod(tri, field, em_tile, /*with_metric*/ true);
 
         // S2 mesh: the Ling target and the shadow substrate.
         ks::MeshData md;
@@ -456,15 +458,20 @@ void test_weighted_area_sampling(const ConfigArgs &args, const fs::path &task_di
                 }
                 return best;
             };
-            double t_pyr = time_min([&]() { dmap::TaylorPyramid p(field.values, field.W, field.scale, build); });
-            double t_hier =
-                time_min([&]() { dmap::DescentSampler s(tri, field, em, dmap::DescentWeight::Product, beta, build); });
-            double t_table = time_min([&]() { dmap::TexelTableSampler t(tri, field, em, true); });
+            // Hierarchy build = the shared tile data (pyramid, emission
+            // mean and max) plus the triangle's footprint.
+            double t_pyr = time_min([&]() { dmap::TaylorPyramid p(field, build); });
+            double t_em = time_min([&]() { dmap::EmissionTile e(em); });
+            double t_fp = time_min(
+                [&]() { dmap::DescentSampler s(tri, field, pyramid, em_tile, dmap::DescentWeight::Product, beta); });
+            double t_hier = t_pyr + t_em + t_fp;
+            double t_table = time_min([&]() { dmap::TexelTableSampler t(tri, field, em_tile, true); });
             size_t mem_hier = 0;
-            for (const dmap::TaylorLevel &lvl : samp_prod.pyramid.levels)
+            for (const dmap::TaylorLevel &lvl : pyramid.levels)
                 mem_hier += 8 * lvl.h0.size() * sizeof(double);
-            for (const std::vector<double> &lvl : samp_prod.e_sum)
-                mem_hier += lvl.size() * sizeof(double);
+            for (const dmap::EmissionTile::Level &lvl : em_tile.levels)
+                mem_hier += (lvl.mean.size() + lvl.max.size()) * sizeof(double);
+            mem_hier += samp_prod.footprint.nodes.size() * sizeof(dmap::FootprintNode);
             size_t mem_table = table_prod.table.margin.cdf.size() * sizeof(float);
             for (const ks::DistribTable &row : table_prod.table.cond)
                 mem_table += row.cdf.size() * sizeof(float);

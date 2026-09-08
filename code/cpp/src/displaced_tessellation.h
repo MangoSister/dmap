@@ -3,6 +3,7 @@
 #include "displaced_surface.h"
 #include "ks/geometry.h"
 #include "texture_grid.h"
+#include "uv_clip.h"
 
 // Pre-tessellated displaced mesh: evaluate S = P + h*N on a uniform
 // barycentric grid per base triangle and emit a ks MeshData. This is the
@@ -27,6 +28,29 @@ TessellationGrid tessellation_grid(int n);
 // texcoords (u, v), vertex normals from the normalized surface normal.
 // Buffers are unpadded until finalize_mesh_data.
 void append_displaced_triangle(ks::MeshData &out, const BaseTriangle &tri, const HeightGrid &field, int n);
+
+// One face of a texel-aligned tessellation: its base triangle and the
+// tile coordinates of its three vertices; interior faces come from
+// sub-cells inside the domain, the others from the clipped sub-cells at
+// its boundary.
+struct TexelFace
+{
+    int triangle = -1;
+    ks::vec2d st[3];
+    bool interior = true;
+};
+
+// Append the displaced surface over the texel lattice of one base
+// triangle: every leaf cell (n_leaf per tile) meeting the domain is split
+// into m x m sub-cells, each sub-cell inside the domain into the two
+// triangles of tessellation_grid's diagonal, and each sub-cell straddling
+// the domain into the fan of its clipped polygon. With m = 1 this is the
+// surface of the two-triangle leaf (displaced_intersector.h). Aligned
+// with the creases of the bilinear height at texel boundaries, its chord
+// error is that of a smooth patch, unlike the barycentric grid's at
+// general charts.
+void append_texel_tessellation(ks::MeshData &out, const BaseTriangle &tri, const HeightGrid &field, int n_leaf, int m,
+                               int triangle, std::vector<TexelFace> &faces);
 
 // Apply the MeshData buffer padding convention (ks/geometry.h). Call once,
 // after the last append.

@@ -1,0 +1,48 @@
+# T6 verification: the displaced surfaces as embree user geometry inside
+# ks's scene, on every scene of the set: S1 to S3 (one displaced object
+# each), S4 (two placements of the torus, a displaced emitter, plain meshes)
+# and S5 (glTF prototypes and instances with dmap extras).
+include = [
+  "../scenes/s1_triangle.toml",
+  "../scenes/s2_torus_rock.toml",
+  "../scenes/s3_spot_cobble.toml",
+  "../scenes/s4_mixed.toml",
+  "../scenes/s5_blender.toml",
+  "../scenes/s7_orbit.toml",
+]
+
+[[task]]
+type = "validate_displaced_geometry"
+scene = "scene.s1"
+n_rays = 20000
+seed = 2027
+
+[[task]]
+type = "validate_displaced_geometry"
+scene = "scene.s2"
+n_rays = 20000
+seed = 2027
+
+[[task]]
+type = "validate_displaced_geometry"
+scene = "scene.s3"
+n_rays = 20000
+seed = 2027
+
+[[task]]
+type = "validate_displaced_geometry"
+scene = "scene.s4"
+n_rays = 20000
+seed = 2027
+
+[[task]]
+type = "validate_displaced_geometry"
+scene = "scene.s5"
+n_rays = 20000
+seed = 2027
+
+[[task]]
+type = "validate_displaced_geometry"
+scene = "scene.s7"
+n_rays = 20000
+seed = 2027

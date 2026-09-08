@@ -18,6 +18,7 @@
 // Plus a sanity check of the mean/max mip pyramid. One verdict.
 
 #include "displaced_surface.h"
+#include "emission_tile.h"
 #include "ks/assertion.h"
 #include "ks/config.h"
 #include "ks/log_util.h"
@@ -186,7 +187,10 @@ void validate_pyramid(const ConfigArgs &args, const fs::path &task_dir, int task
         // global mean, the root max the global max.
         {
             const std::vector<double> &grid = pyr_fold.levels[0].h0;
-            dmap::MipPyramid mip(grid.data(), pyr_fold.n_leaf);
+            dmap::TextureGrid grid_tex;
+            grid_tex.W = grid_tex.H = pyr_fold.n_leaf;
+            grid_tex.values = grid;
+            dmap::EmissionTile mip(grid_tex);
             double mean = 0.0, mx = -INFINITY;
             for (double v : grid) {
                 mean += v;

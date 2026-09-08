@@ -1,0 +1,101 @@
+# T8 verification (validate_path_tracer.cpp), checks (2) and (3). Check (1),
+# the regression gate, is validate_path_tracer_regression.toml and must
+# run with `dmap -n 1`.
+include = [
+  "../scenes/s6_scifi.toml",
+  "../scenes/s4_mixed.toml",
+  "../scenes/s7_orbit.toml",
+]
+
+# (2) The MIS check on S6: two displaced emitters, no other light.
+[[task]]
+type = "validate_path_tracer"
+check = "mis"
+scene = "scene.s6"
+spp_check = 64
+spp_ref = 1024
+tolerance = 0.02
+bounces = 1
+render_width = 200
+render_height = 150
+spp = 64
+rng_seed = 7
+tone_mapper = { type = "aces", exposure = 1.0 }
+
+# (3) S4 path-traced with the displaced surfaces against its texel-aligned
+# substitute with ks's mesh lights.
+[[task]]
+type = "validate_path_tracer"
+check = "substitute"
+scene = "scene.s4"
+substitute_subdivision = 1
+tolerance_rel_mse = 0.05
+tolerance_mean = 0.02
+bounces = 4
+render_width = 200
+render_height = 150
+spp = 256
+spp_prog_interval = 256
+rng_seed = 7
+tone_mapper = { type = "aces", exposure = 1.0 }
+
+# (2) on S7: one displaced emitter, the station torus, plus the directional
+# sun, a delta light, which every strategy samples. The ring lights itself
+# at close range, so next-event estimation alone has infinite variance
+# there and its mean converges slowly from below (2.5% low at 4096
+# samples per pixel, log 2026-09-07); it gets a looser bound.
+[[task]]
+type = "validate_path_tracer"
+check = "mis"
+scene = "scene.s7"
+min_displaced_emitters = 1
+spp_check = 1024
+spp_ref = 4096
+tolerance = 0.02
+tolerance_nee = 0.05
+bounces = 1
+render_width = 200
+render_height = 150
+spp = 64
+rng_seed = 7
+tone_mapper = { type = "aces", exposure = 1.0 }
+
+# (3) on S6 at full resolution: each panel's substitute has 524k triangles.
+# The panels light themselves at close range, so the noise floor between
+# two seeds is high and the bound follows it.
+[[task]]
+type = "validate_path_tracer"
+check = "substitute"
+scene = "scene.s6"
+substitute_subdivision = 1
+tolerance_rel_mse = 0.05
+tolerance_mean = 0.02
+bounces = 4
+render_width = 200
+render_height = 150
+spp = 256
+spp_prog_interval = 256
+rng_seed = 7
+tone_mapper = { type = "aces", exposure = 1.0 }
+
+# (3) on S7 with the 64-texel asset, whose texel-aligned substitute at two
+# sub-cells per texel has 2.1 million triangles (the 512-texel one would
+# have 134 million). At 64 texels per tile the reference itself is coarse
+# against the 8-texel strips of the 2048-texel emission map, and it
+# converges to the displaced render as it refines: mean luminance 2.5% low
+# and relative MSE 0.43 at one sub-cell per texel, 1.9% and 0.12 at two
+# (log 2026-09-07); the bounds allow that residual.
+[[task]]
+type = "validate_path_tracer"
+check = "substitute"
+scene = "scene.s7_64"
+substitute_subdivision = 2
+tolerance_rel_mse = 0.15
+tolerance_mean = 0.03
+bounces = 4
+render_width = 200
+render_height = 150
+spp = 256
+spp_prog_interval = 256
+rng_seed = 7
+tone_mapper = { type = "aces", exposure = 1.0 }

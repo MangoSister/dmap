@@ -1,0 +1,46 @@
+# T6 verification: primary-ray AOVs of every scene through ks's scene with
+# the displaced surfaces as user geometry, against the same scene with
+# texel-aligned pre-tessellated substitutes. The subdivision per texel is
+# what the substitute's face count allows.
+include = [
+  "../scenes/s1_triangle.toml",
+  "../scenes/s2_torus_rock.toml",
+  "../scenes/s3_spot_cobble.toml",
+  "../scenes/s4_mixed.toml",
+  "../scenes/s5_blender.toml",
+]
+
+[[task]]
+type = "render_aovs"
+scene = "scene.s1"
+width = 320
+height = 240
+substitute_subdivision = 4
+
+[[task]]
+type = "render_aovs"
+scene = "scene.s2"
+width = 320
+height = 240
+substitute_subdivision = 1
+
+[[task]]
+type = "render_aovs"
+scene = "scene.s3"
+width = 320
+height = 240
+substitute_subdivision = 2
+
+[[task]]
+type = "render_aovs"
+scene = "scene.s4"
+width = 320
+height = 240
+substitute_subdivision = 1
+
+[[task]]
+type = "render_aovs"
+scene = "scene.s5"
+width = 320
+height = 240
+substitute_subdivision = 1

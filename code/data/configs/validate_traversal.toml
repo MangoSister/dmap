@@ -1,0 +1,34 @@
+# T4 verification: the traversal and the leaf intersectors on S1 (the
+# experiment triangle, identity chart: the two-triangle leaf against embree
+# over the matched mesh), S2 (the torus with its own layout) and S3 (spot with
+# the tile repeated). The Newton leaf is compared with the texel-aligned mesh
+# at fine_subdivision sub-cells per texel.
+include = [
+  "../scenes/s1_triangle.toml",
+  "../scenes/s2_torus_rock.toml",
+  "../scenes/s3_spot_cobble.toml",
+]
+
+[[task]]
+type = "validate_traversal"
+scene = "scene.s1"
+n_rays = 50000
+n_mode_rays = 20000
+fine_subdivision = 4
+seed = 2027
+
+[[task]]
+type = "validate_traversal"
+scene = "scene.s2"
+n_rays = 50000
+n_mode_rays = 20000
+fine_subdivision = 4
+seed = 2027
+
+[[task]]
+type = "validate_traversal"
+scene = "scene.s3"
+n_rays = 50000
+n_mode_rays = 20000
+fine_subdivision = 4
+seed = 2027

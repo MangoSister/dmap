@@ -212,7 +212,8 @@ PyramidBuild pyramid_build_from_string(const std::string &name)
 
 const char *pyramid_build_name(PyramidBuild build) { return build == PyramidBuild::Fold ? "fold" : "direct"; }
 
-TaylorPyramid::TaylorPyramid(const double *values, int nodes, double scale, PyramidBuild build) : build(build)
+TaylorPyramid::TaylorPyramid(const double *values, int nodes, double scale, PyramidBuild build, double offset)
+    : build(build)
 {
     int n = nodes - 1;
     ASSERT(n >= 1 && (n & (n - 1)) == 0, "pyramid needs a (2^L + 1) x (2^L + 1) node grid, got %d nodes", nodes);
@@ -234,6 +235,42 @@ TaylorPyramid::TaylorPyramid(const double *values, int nodes, double scale, Pyra
         for (int level = 0; level < n_levels; ++level)
             levels.push_back(direct_level(V, nodes, c, n_leaf, level));
     }
+
+    // A constant shift of h moves the plane's value and the height range
+    // and nothing else; applied after the build so the golden comparisons
+    // (offset 0) see the reference arithmetic unchanged.
+    if (offset != 0.0) {
+        for (TaylorLevel &lvl : levels) {
+            for (size_t k = 0; k < lvl.h0.size(); ++k) {
+                lvl.h0[k] += offset;
+                lvl.h_min[k] += offset;
+                lvl.h_max[k] += offset;
+            }
+        }
+    }
+}
+
+TaylorPyramid::TaylorPyramid(const HeightGrid &field, PyramidBuild build)
+    : TaylorPyramid(field.values, field.W, field.scale, build, field.offset)
+{
+    ASSERT(field.W == field.H, "pyramid needs a square node grid, got %d x %d", field.W, field.H);
+}
+
+TaylorNode TaylorPyramid::node(int level, int64_t i, int64_t j) const
+{
+    if (level >= n_levels) {
+        // Union of whole tiles: the root's range as a min-max node.
+        const TaylorLevel &root = levels.back();
+        double lo = root.h_min[0], hi = root.h_max[0];
+        return {0.5 * (lo + hi), 0.0, 0.0, 0.5 * (hi - lo), root.ru[0], root.rv[0], lo, hi};
+    }
+    const TaylorLevel &lvl = levels[level];
+    auto wrap = [&](int64_t a) {
+        int64_t r = a % lvl.m;
+        return r < 0 ? r + lvl.m : r;
+    };
+    size_t k = (size_t)wrap(j) * lvl.m + wrap(i);
+    return {lvl.h0[k], lvl.gu[k], lvl.gv[k], lvl.r[k], lvl.ru[k], lvl.rv[k], lvl.h_min[k], lvl.h_max[k]};
 }
 
 void minmax_from_taylor(const TaylorLevel &level, double s, std::vector<double> &lo, std::vector<double> &hi)
@@ -245,45 +282,6 @@ void minmax_from_taylor(const TaylorLevel &level, double s, std::vector<double> 
         double half = std::abs(level.gu[k]) * s + std::abs(level.gv[k]) * s + level.r[k];
         lo[k] = level.h0[k] - half;
         hi[k] = level.h0[k] + half;
-    }
-}
-
-MipPyramid::MipPyramid(const double *cell_values, int n)
-{
-    ASSERT(n >= 1 && (n & (n - 1)) == 0, "mip pyramid needs a 2^L x 2^L cell grid, got %d", n);
-    n_leaf = n;
-    n_levels = 1;
-    while ((1 << n_levels) <= n)
-        ++n_levels;
-
-    MipLevel leaf;
-    leaf.m = n;
-    leaf.mean.assign(cell_values, cell_values + (size_t)n * n);
-    leaf.max.assign(cell_values, cell_values + (size_t)n * n);
-    levels.push_back(std::move(leaf));
-
-    while (levels.back().m > 1) {
-        const MipLevel &c = levels.back();
-        MipLevel p;
-        p.m = c.m / 2;
-        p.mean.resize((size_t)p.m * p.m);
-        p.max.resize((size_t)p.m * p.m);
-        for (int J = 0; J < p.m; ++J) {
-            for (int I = 0; I < p.m; ++I) {
-                double sum = 0.0, mx = -INFINITY;
-                for (int a = 0; a < 2; ++a) {
-                    for (int b = 0; b < 2; ++b) {
-                        double v = c.mean[(size_t)(2 * J + a) * c.m + (2 * I + b)];
-                        double vmax = c.max[(size_t)(2 * J + a) * c.m + (2 * I + b)];
-                        sum += v;
-                        mx = std::max(mx, vmax);
-                    }
-                }
-                p.mean[(size_t)J * p.m + I] = 0.25 * sum;
-                p.max[(size_t)J * p.m + I] = mx;
-            }
-        }
-        levels.push_back(std::move(p));
     }
 }
 

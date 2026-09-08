@@ -1,0 +1,10 @@
+[[task]]
+type = "validate_chart"
+mesh = "simple/cc_torus.obj"
+n_triangles = 20
+n_charts = 5
+n_points = 200
+tex_nodes = 65
+tolerance_chain = 1e-9
+tolerance_clip = 1e-11
+seed = 2027

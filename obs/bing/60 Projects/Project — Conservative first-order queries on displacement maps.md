@@ -13,7 +13,7 @@ target-venue: TBD (Eurographics / SIGGRAPH Asia)
 > The current paper organization is **Application 1: Area/Sampling**,
 > **Application 2: Ray Tracing**, and **Application 3: pending**. Use
 > [[Paper — Application 2 — Tessellation-free ray tracing]] as the maintained
-> ray chapter through P31. Earlier notes may number ray tracing first and record
+> ray chapter through P33. Earlier notes may number ray tracing first and record
 > superseded negative architectures; preserve them for provenance, but do not
 > use their numbering or conclusions as the current paper state.
 > Vault navigation and historical classifications: [[Index — 60 Projects]].

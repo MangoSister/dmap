@@ -13,7 +13,7 @@ authoring-model: user-writes-full-draft
 > [!important] Current application organization — 2026-09-07
 > The maintained authoring order is **Application 1: Area/Sampling**,
 > **Application 2: Ray Tracing**, and **Application 3: pending**. The complete
-> ray-tracing record through P31 is [[Paper — Application 2 — Tessellation-free ray tracing]].
+> ray-tracing record through P33 is [[Paper — Application 2 — Tessellation-free ray tracing]].
 > Older ray-first numbering and earlier negative checkpoints are
 > retained as development history; they do not override the current chapter or
 > its later frozen evidence.

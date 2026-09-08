@@ -1,0 +1,40 @@
+# T5, the traversal cost measurement: node tests, leaf tests and the time per
+# ray for the node tests box, slab and both with the level policy k = 0..L, on
+# S1 (the experiment triangle), S2 (the torus with its own layout) and S3
+# (spot with the tile repeated), against embree over the texel-aligned mesh at
+# texel resolution. expected_crossover is the crossover level on the walk's
+# nodes: T3's value ("Result — Node bound tightness") on S1 and S2, where it
+# transfers; on S3 T3's marginal level-0 win does not transfer and the box is
+# the shorter interval at every level (-1, "Result — Traversal cost study").
+include = [
+  "../scenes/s1_triangle.toml",
+  "../scenes/s2_torus_rock.toml",
+  "../scenes/s3_spot_cobble.toml",
+]
+
+[[task]]
+type = "test_traversal_cost"
+scene = "scene.s1"
+n_rays = 50000
+repetitions = 3
+n_record_rays = 10000
+expected_crossover = 2
+seed = 2027
+
+[[task]]
+type = "test_traversal_cost"
+scene = "scene.s2"
+n_rays = 50000
+repetitions = 3
+n_record_rays = 10000
+expected_crossover = 4
+seed = 2027
+
+[[task]]
+type = "test_traversal_cost"
+scene = "scene.s3"
+n_rays = 50000
+repetitions = 3
+n_record_rays = 10000
+expected_crossover = -1
+seed = 2027

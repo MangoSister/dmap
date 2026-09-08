@@ -192,6 +192,10 @@ set(DMAP_SRC
   src/displaced_tessellation.cpp
   src/taylor_pyramid.h
   src/taylor_pyramid.cpp
+  src/uv_clip.h
+  src/uv_clip.cpp
+  src/emission_tile.h
+  src/emission_tile.cpp
   src/line_sampling.h
   src/line_sampling.cpp
   src/bilinear_patch.h
@@ -208,7 +212,47 @@ set(DMAP_SRC
   src/validate_line_sampling.cpp
   src/validate_tessellation.cpp
   src/validate_descent.cpp
+  src/validate_chart.cpp
   src/test_weighted_area_sampling.cpp
+  src/traversal_options.h
+  src/traversal_options.cpp
+  src/displacement_asset.h
+  src/displacement_asset.cpp
+  src/gltf_asset.h
+  src/gltf_asset.cpp
+  src/emissive_material.h
+  src/emissive_material.cpp
+  src/scene_spec.h
+  src/scene_spec.cpp
+  src/describe_scene.cpp
+  src/affine_form.h
+  src/affine_form.cpp
+  src/node_bounds.h
+  src/node_bounds.cpp
+  src/validate_node_bounds.cpp
+  src/displaced_intersector.h
+  src/displaced_intersector.cpp
+  src/validate_traversal.cpp
+  src/traversal_test_util.h
+  src/traversal_test_util.cpp
+  src/test_traversal_cost.cpp
+  src/displaced_geometry.h
+  src/displaced_geometry.cpp
+  src/displaced_scene.h
+  src/displaced_scene.cpp
+  src/validate_displaced_geometry.cpp
+  src/render_aovs.cpp
+  src/validate_small_pt_regression.cpp
+  src/displaced_area_light.h
+  src/displaced_area_light.cpp
+  src/image_compare.h
+  src/image_compare.cpp
+  src/path_trace.h
+  src/path_trace.cpp
+  src/validate_path_tracer.cpp
+  src/direct_lighting.h
+  src/direct_lighting.cpp
+  src/test_emitter_ladder.cpp
 )
 
 #-----------------------------------------------------------------------------

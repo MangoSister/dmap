@@ -1,3 +1,6 @@
+#include "displacement_asset.h"
+#include "emissive_material.h"
+#include "gltf_asset.h"
 #include "ks/config.h"
 #include "ks/gpu/ksvk.h"
 #include "ks/log_util.h"
@@ -8,9 +11,13 @@
 #include "ks/parallel.h"
 #include "ks/subsurface.h"
 #include "ks/texture.h"
+#include "scene_spec.h"
 #include <filesystem>
+#include <fstream>
+#include <iterator>
 namespace fs = std::filesystem;
 #include <cxxopts.hpp>
+#include <toml.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #ifndef WIN32_LEAN_AND_MEAN
@@ -47,7 +54,45 @@ DECLARE_TASK(test_pyramid_channels);
 DECLARE_TASK(validate_line_sampling);
 DECLARE_TASK(validate_bilinear_patch);
 DECLARE_TASK(validate_descent);
+DECLARE_TASK(validate_chart);
 DECLARE_TASK(render_displaced_emitter);
+DECLARE_TASK(describe_scene);
+DECLARE_TASK(validate_node_bounds);
+DECLARE_TASK(validate_traversal);
+DECLARE_TASK(test_traversal_cost);
+DECLARE_TASK(validate_displaced_geometry);
+DECLARE_TASK(render_aovs);
+DECLARE_TASK(validate_small_pt_regression);
+DECLARE_TASK(path_trace);
+DECLARE_TASK(validate_path_tracer);
+DECLARE_TASK(test_emitter_ladder);
+
+// A config may prepend other config files, so that scenes (assets plus a
+// [scene.<name>] table, code/data/scenes) are shared by many task configs:
+//     include = ["../scenes/s2_torus_rock.toml"]
+// Paths are relative to the config file. The texts are concatenated, so
+// the tables of the files must not collide.
+static std::string read_config_with_includes(const fs::path &path)
+{
+    auto read_text = [](const fs::path &p) {
+        std::ifstream file(p);
+        ASSERT(file.is_open(), "cannot open config [%s]", p.string().c_str());
+        return std::string(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
+    };
+    std::string text = read_text(path);
+    std::string joined;
+    toml::table table = toml::parse(text);
+    if (const toml::array *includes = table["include"].as_array()) {
+        for (const toml::node &node : *includes) {
+            std::optional<std::string> rel = node.value<std::string>();
+            ASSERT(rel, "include entries must be strings");
+            joined += read_text(path.parent_path() / *rel);
+            joined += "\n";
+        }
+    }
+    joined += text;
+    return joined;
+}
 
 int main(int argc, char *argv[])
 {
@@ -69,7 +114,7 @@ int main(int argc, char *argv[])
     if (!asset_root_dir.empty()) {
         cfg.set_asset_root_dir(fs::path(asset_root_dir));
     }
-    cfg.parse_file(cfg_path);
+    cfg.parse(read_config_with_includes(cfg_path));
 
     create_default_logger(cfg.output_directory() / "log.txt");
 
@@ -108,11 +153,15 @@ int main(int argc, char *argv[])
     cfg.register_asset("opacity_map", create_opacity_map);
     cfg.register_asset("bsdf", create_bsdf);
     cfg.register_asset("bssrdf", create_bssrdf);
-    cfg.register_asset("material", create_material);
+    // dmap's parsers under ks's prefixes: materials with an emission field,
+    // glTF assets that keep node names and extras (path tracer plan, T2).
+    cfg.register_asset("material", dmap::create_material);
     cfg.register_asset("mesh_asset", create_mesh_asset);
-    cfg.register_asset("compound_mesh_asset", create_compound_mesh_asset);
+    cfg.register_asset("compound_mesh_asset", dmap::create_gltf_asset);
     // cfg.register_asset("camera_animation", create_camera_animation);
     // cfg.register_asset("gaussian_scene", create_gaussian_scene_asset);
+    cfg.register_asset("displacement", dmap::create_displacement_asset);
+    cfg.register_asset("scene", dmap::create_scene_spec); // last: a scene refers to every other asset
     cfg.load_assets();
 
     // These does not need to be ordered.
@@ -128,7 +177,18 @@ int main(int argc, char *argv[])
     cfg.register_task("validate_line_sampling", validate_line_sampling);
     cfg.register_task("validate_bilinear_patch", validate_bilinear_patch);
     cfg.register_task("validate_descent", validate_descent);
+    cfg.register_task("validate_chart", validate_chart);
     cfg.register_task("render_displaced_emitter", render_displaced_emitter);
+    cfg.register_task("describe_scene", describe_scene);
+    cfg.register_task("validate_node_bounds", validate_node_bounds);
+    cfg.register_task("validate_traversal", validate_traversal);
+    cfg.register_task("test_traversal_cost", test_traversal_cost);
+    cfg.register_task("validate_displaced_geometry", validate_displaced_geometry);
+    cfg.register_task("render_aovs", render_aovs);
+    cfg.register_task("validate_small_pt_regression", validate_small_pt_regression);
+    cfg.register_task("path_trace", path_trace);
+    cfg.register_task("validate_path_tracer", validate_path_tracer);
+    cfg.register_task("test_emitter_ladder", test_emitter_ladder);
     cfg.run_all_tasks();
 
     return 0;

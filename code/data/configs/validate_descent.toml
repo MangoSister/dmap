@@ -30,3 +30,42 @@ beta = 0.05
 pyramid_build = "direct"
 tv_threshold = 0.05
 seed = 2027
+
+# The same checks under a general chart: a seeded triangle in the texture
+# plane, and the same triangle tiled three times with an offset so the
+# domain spans several repeats of the tile (path tracer plan T1).
+[[task]]
+type = "validate_descent"
+mesh = "simple/cc_torus.obj"
+texture = "simple/disp_rock.png"
+tex_nodes = 65
+amplitude = 0.2
+triangle_index = -1
+n_samples = 500000
+n_samples_hist = 2000000
+n_samples_pdf = 200000
+beta = 0.05
+pyramid_build = "fold"
+tv_threshold = 0.05
+seed = 2027
+chart = "random"
+chart_seed = 7
+
+[[task]]
+type = "validate_descent"
+mesh = "simple/cc_torus.obj"
+texture = "simple/disp_rock.png"
+tex_nodes = 65
+amplitude = 0.2
+triangle_index = -1
+n_samples = 500000
+n_samples_hist = 2000000
+n_samples_pdf = 200000
+beta = 0.05
+pyramid_build = "direct"
+tv_threshold = 0.05
+seed = 2027
+chart = "random"
+chart_seed = 7
+uv_scale = 3.0
+uv_offset = [1.7, -0.4]

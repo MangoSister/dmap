@@ -2,7 +2,7 @@
 title: "Application 2 — Tessellation-free ray tracing with event-segmented shell rays"
 tags: [paper, application-2, ray-tracing, displacement-maps, first-order, dda]
 status: maintained-draft
-evidence-cutoff: P31
+evidence-cutoff: P33
 updated: 2026-09-07
 ---
 
@@ -11,7 +11,7 @@ updated: 2026-09-07
 > **Status and intended use.** This is the maintained Markdown chapter for the
 > ray-tracing application of the eventual three-application first-order
 > representation paper. It synthesizes the preserved implementation and
-> measurements through P31. It does not replace or overwrite the standalone
+> measurements through P33. It does not replace or overwrite the standalone
 > [LaTeX ray-tracing draft](../../../../paper_dmap_query/ray-tracing-only-draft.tex).
 > Numbers are attached to their frozen reports, and statements labeled as
 > interpretation or open work are not experimental facts.
@@ -951,6 +951,60 @@ than described as exact agreement. Full provenance is in the
 [P31 summary](../../../../docs/p31_purchased_beauties_summary.md) and
 [uncontended timing directory](../../../../experiments/p31_uncontended_sequential_10x30_1280x1024).
 
+### 14.8 P32 artist-scene scale and proxy correction
+
+P32 corrects three presentation choices identified by visual review while
+keeping P31 frozen. The sci-fi capsule becomes a sphere with a `2 x 1`
+equirectangular texture repeat, matching physical U/V texel density near the
+equator. The wood material moves to an eight-facet column with two U repeats;
+its atlas-cell physical width/height ratio is `1.000864`. The dry-branch saddle
+becomes an exactly planar `52 x 52` UV grid, so none of the broad curvature is
+base geometry. Both arms share each corrected proxy, UVs, materials, lighting,
+camera, executable, and sampling schedule.
+
+| Corrected scene | Mode 0 | Ours | Total | G-buffer | Path | PSNR | Mask mismatch |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Sci-fi sphere | 23.431 ms | 15.533 ms | **1.508x** | 1.368x | 1.548x | 44.129 dB | 0.000687% |
+| Wood-block column | 21.007 ms | 11.965 ms | **1.756x** | 1.580x | 1.811x | 33.541 dB | 0.012817% |
+| Dry-branch flat grid | 39.830 ms | 12.852 ms | **3.099x** | 1.866x | 3.401x | 53.575 dB | 0.011444% |
+
+The three-scene geometric means are **2.017x** overall, **1.592x** for the
+G-buffer, and **2.121x** for path tracing. These are art-direction cases, not a
+replacement for the full P23 aggregate. A literal two-triangle flat-card
+ablation is also retained: it is `0.985x` overall (24.441 ms versus 24.805 ms),
+despite a `1.555x` G-buffer gain, because its path phase is `0.946x`. Thus the
+accepted grid removes the visually unjustified saddle but also represents a
+production UV partition on which hierarchical traversal has useful work to
+skip. The complete record is the
+[P32 correction report](../../../../docs/p32_artist_scene_corrections.md).
+
+### 14.9 P33 metric reactor pod and finer branch scale
+
+P33 restores the more distinctive capsule silhouette without restoring its U/V
+stretch. The true capsule uses normalized meridian arc length for V, radius
+`r=0.285`, and cylindrical half-length `h=pi*r/6`. With an integer `3 x 2`
+repeat, the U-tile length on the barrel equals the V-tile length exactly:
+`(2*pi*r)/3 = (pi*r+2*h)/2 = 0.5969026`. The main engineered panels therefore
+retain square physical scale; only the unavoidable polar convergence remains.
+The proxy contains 4,992 triangles.
+
+The dry-branch scene retains P32's exactly planar `52 x 52` grid but changes
+the repeat isotropically from `1 x 1` to `1.35 x 1.35`. Branch footprints are
+therefore 74.1% of the P32 size in both directions, and displacement amplitude
+drops from `0.052` to `0.040` to keep relief height approximately proportional.
+
+| Scene | Mode 0 | Ours | Total | G-buffer | Path | PSNR | Mask mismatch |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Metric reactor pod | 23.800 ms | 13.580 ms | **1.753x** | 1.541x | 1.828x | 43.471 dB | 0.000076% |
+| Finer flat branches | 42.375 ms | 13.641 ms | **3.106x** | 1.934x | 3.404x | 52.031 dB | 0.016632% |
+
+These are matched 1280x1024 full-render comparisons with the same 10+30 timing
+and 256-spp hero protocol as P32. Both arms share all scene state, and the
+candidate retains first-order primary/outgoing bounds, linear segments, global
+front-to-back DDA, and no nonlinear fallback. P32 remains frozen; P33 replaces
+only its paper-facing sci-fi and dry-branch choices. See the
+[P33 record](../../../../docs/p33_metric_reactor_and_finer_branches.md).
+
 ## 15. Ablations and mechanism evidence
 
 ### 15.1 Where the full speedup comes from
@@ -1022,8 +1076,8 @@ the pruning mechanism; they are not standalone performance ratios.
 | Broad performance | [P23 matrix PDF](../../../../figures/ray_tracing_paper/rt_p23_performance_matrix.pdf) | Shows speed regimes and regressions |
 | Accuracy | [P23 agreement PDF](../../../../figures/ray_tracing_paper/rt_p23_render_agreement.pdf) | Paired representative render/AOV evidence |
 | Hero row | [standalone beauty directory](../../../../figures/paper_beauty_ours/README.md) | Use individual unlabelled ours images, not montages |
-| Tessellation-free input explanation | [P30 coarse report](../../../../experiments/p30_coarse_mesh_references/report.json) and [P31 coarse report](../../../../experiments/p31_coarse_mesh_references/report_p31.json) | Place coarse proxy beside displaced beauty |
-| New material quartet | [P31 summary](../../../../docs/p31_purchased_beauties_summary.md) | Sci-fi/reliquary above, quilt/branches below; capsule and cushion are the clearest base/result pairs |
+| Tessellation-free input explanation | [P30 coarse report](../../../../experiments/p30_coarse_mesh_references/report.json), [P31 frozen report](../../../../experiments/p31_coarse_mesh_references/report_p31.json), [P32 corrected report](../../../../experiments/p32_coarse_mesh_references/report_p32.json), and [P33 current report](../../../../experiments/p33_coarse_mesh_references/report_p33.json) | Place coarse proxy beside displaced beauty |
+| Purchased-material quartet | [P33 metric/scale refinements](../../../../docs/p33_metric_reactor_and_finer_branches.md), [P32 corrections](../../../../docs/p32_artist_scene_corrections.md), and [P31 frozen summary](../../../../docs/p31_purchased_beauties_summary.md) | Use reactor pod, finer flat ground, octagonal wood column, and P31 quilt |
 
 The PNG versions are convenient for Markdown and slides; use PDF/SVG in the
 paper. The source generator is
@@ -1111,8 +1165,8 @@ the incremental first-order benefit. A new output directory is intentional.
 
 The first command checks the common 30-case TFDM-eligible manifest. The latter
 two regenerate/validate the explanatory figures and all eleven undeformed proxy
-references. Exact artist-scene rendering commands live in the P26–P31 documents
-linked in Sections 14.6–14.7; keeping them there avoids silently simplifying their
+references. Exact artist-scene rendering commands live in the P26–P33 documents
+linked in Sections 14.6–14.9; keeping them there avoids silently simplifying their
 camera, material, light, and sampling contracts.
 
 ### 18.4 Manuscript build
@@ -1233,6 +1287,11 @@ represented by the [machine-readable report](../../../../experiments/p30_coarse_
 [integrated scene report](../../../../docs/p31_purchased_beauties_summary.md),
 [uncontended timing artifacts](../../../../experiments/p31_uncontended_sequential_10x30_1280x1024),
 and [four-scene coarse report](../../../../experiments/p31_coarse_mesh_references/report_p31.json).
+P32 adds the [scale/proxy correction record](../../../../docs/p32_artist_scene_corrections.md),
+three locked paired render directories linked there, and the
+[corrected coarse report](../../../../experiments/p32_coarse_mesh_references/report_p32.json).
+P33 adds the [metric/scale refinement record](../../../../docs/p33_metric_reactor_and_finer_branches.md)
+and [current two-scene coarse report](../../../../experiments/p33_coarse_mesh_references/report_p33.json).
 
 Maintenance rules:
 
