@@ -54,7 +54,7 @@ vault. Every row below is now directly navigable.
 |---|---|
 | [[Project — Conservative first-order queries on displacement maps]] | Umbrella history, decisions, and current application map. Read the dated top callout before older body text. |
 | [[Guide — Eurographics paper draft]] | Maintained authoring/evidence guide. |
-| [[Paper — Application 2 — Tessellation-free ray tracing]] | Current comprehensive Application 2 chapter through P31. |
+| [[Paper — Application 2 — Tessellation-free ray tracing]] | Current comprehensive Application 2 chapter through P33. |
 
 There is not yet a maintained Application 1 chapter in this directory. The S1–S3
 notes document a completed negative/stopped sampling line and must not be
@@ -68,8 +68,8 @@ unassigned.
 | Code | Inbound before index | Note | Audit interpretation |
 |---|---:|---|---|
 | C | 11 | [[Guide — Eurographics paper draft]] | Current writing guide; top application-order callout supersedes older ray-first prose. |
-| C | 1 | [[Paper — Application 2 — Tessellation-free ray tracing]] | Current ray chapter; direct source of truth through P31. |
-| C | 15 | [[Project — Conservative first-order queries on displacement maps]] | Current umbrella/history; later top callout and P18–P31 evidence supersede earlier decisions inside the long note. |
+| C | 1 | [[Paper — Application 2 — Tessellation-free ray tracing]] | Current ray chapter; direct source of truth through P33. |
+| C | 15 | [[Project — Conservative first-order queries on displacement maps]] | Current umbrella/history; later top callout and P18–P33 evidence supersede earlier decisions inside the long note. |
 
 ### Frozen reference, decision, and evidence records
 
@@ -109,7 +109,7 @@ unassigned.
 | S | 4 | [[Plan — A1 GPU mathematical port and differential tests]] | Large historical implementation plan; downstream A2 stop gate closes this line. |
 | S | 1 | [[Plan — Historical Mode 1 correctness repair]] | Historical repair plan; the title already marks its scope. |
 | S | 0 | [[Plan — Mode 1 certified tube-supercover integration]] | Intermediate integration plan, correctness/cost stage complete but noncompetitive. |
-| S | 1 | [[Plan — Mode 1 performance recovery]] | Large recovery log; later terminal decision and P14–P31 line supersede current status. |
+| S | 1 | [[Plan — Mode 1 performance recovery]] | Large recovery log; later terminal decision and P14–P33 line supersede current status. |
 | S | 0 | [[Plan — O0.5 event-local height contraction]] | Passed intermediate gate; superseded by later ordered traversal stages. |
 | S | 9 | [[Plan — Practical first-order DDA ray traversal]] | Historical decision plan with high reuse; not the current measured GPU chapter. |
 | S | 11 | [[Plan — Ray application method, prototype, and baselines]] | Early prototype umbrella; useful derivations, superseded experimental state. |
@@ -142,7 +142,7 @@ unassigned.
   duplicates.
 - The umbrella project and writing guide overlap in status summaries but serve
   distinct navigation and authoring roles.
-- The new Application 2 chapter consolidates P14–P31 for current writing. It
+- The new Application 2 chapter consolidates P14–P33 for current writing. It
   does not make earlier certified-reference or negative-result notes deletable,
   because their assumptions and claim boundaries differ.
 
